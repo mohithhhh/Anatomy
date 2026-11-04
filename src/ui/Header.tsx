@@ -23,7 +23,7 @@ export const Header = forwardRef<HTMLElement, Props>(function Header(
       ref={ref}
       className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-3 p-3 md:p-4"
     >
-      <div className="pointer-events-auto panel px-4 py-2.5">
+      <div className="pointer-events-auto panel min-w-0 px-3 py-2.5 min-[360px]:px-4">
         <h1 className="flex items-center gap-2 text-base font-semibold tracking-tight">
           <span className="inline-block size-2 rounded-full bg-accent" aria-hidden />
           {APP_NAME}
@@ -44,7 +44,7 @@ export const Header = forwardRef<HTMLElement, Props>(function Header(
           className="tap relative flex h-10 items-center gap-2 rounded-xl bg-ink px-3 text-sm font-medium text-white transition-colors hover:bg-ink/85"
         >
           {studying ? <Compass size={18} aria-hidden /> : <GraduationCap size={18} aria-hidden />}
-          <span>{studying ? "Explore" : "Study"}</span>
+          <span className="max-[359px]:sr-only">{studying ? "Explore" : "Study"}</span>
           {!studying && due > 0 && (
             <span
               className="rounded-full bg-amber-400 px-1.5 text-[11px] font-semibold text-ink tabular-nums"
