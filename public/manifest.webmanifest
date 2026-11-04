@@ -1,0 +1,10 @@
+{
+  "name": "Anatomy: 3D study atlas",
+  "short_name": "Anatomy",
+  "description": "A free 3D anatomy atlas with quizzes and spaced repetition.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#eef0f1",
+  "theme_color": "#0f766e",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
