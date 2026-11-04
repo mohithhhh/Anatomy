@@ -4,7 +4,7 @@ import type { ContentIndex } from "../content/content.ts";
 import { REGION_BY_ID, REGION_IDS, isRegionId, type RegionId } from "../content/regions.ts";
 import { hashString } from "./random.ts";
 
-export type QuestionType = "find" | "name" | "side" | "system" | "partOf" | "spatial";
+export type QuestionType = "find" | "name" | "side" | "system" | "partOf" | "spatial" | "nerve";
 
 export const QUESTION_TYPES: readonly { id: QuestionType; label: string; hint: string }[] = [
   { id: "find", label: "Find it", hint: "We name it, you click it" },
@@ -12,6 +12,7 @@ export const QUESTION_TYPES: readonly { id: QuestionType; label: string; hint: s
   { id: "side", label: "Left or right", hint: "Which side of the body?" },
   { id: "partOf", label: "Part of", hint: "Which larger structure?" },
   { id: "spatial", label: "Directions", hint: "Superior, medial, anterior…" },
+  { id: "nerve", label: "Nerve supply", hint: "Limb muscles: which nerve?" },
   { id: "system", label: "Which system", hint: "Only when a deck has several" },
 ];
 const TYPE_IDS = QUESTION_TYPES.map((t) => t.id);
@@ -84,7 +85,7 @@ export const STARTER_DECKS: readonly (DeckFilter & { name: string })[] = [
     name: "Upper limb: muscles",
     regions: ["upper_limb"],
     systems: ["muscular"],
-    types: ["find", "name", "side", "partOf"],
+    types: ["find", "name", "side", "partOf", "nerve"],
   },
   {
     name: "Lower limb: bones and muscles",

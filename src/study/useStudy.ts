@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SystemId } from "../atlas/types.ts";
 import type { ContentIndex, StudyItem } from "../content/content.ts";
+import { EMPTY_CURATED, type CuratedData } from "../content/curated.ts";
 import { track } from "../analytics.ts";
 import { deckItems, type Deck } from "./decks.ts";
 import { gradeTyped, type TypedGrade } from "./grading.ts";
@@ -58,7 +59,7 @@ export interface Overview {
 
 const MAX_REQUEUES = 2;
 
-export function useStudy(content: ContentIndex | null) {
+export function useStudy(content: ContentIndex | null, curated: CuratedData = EMPTY_CURATED) {
   const store = useRef<ProgressStore | null>(null);
   const states = useRef(new Map<string, CardState>());
   const requeues = useRef(new Map<string, number>());
@@ -142,9 +143,10 @@ export function useStudy(content: ContentIndex | null) {
         pool,
         systems,
         `${localDay(Date.now())}:${reps}`,
+        curated,
       );
     },
-    [content],
+    [content, curated],
   );
 
   /** Start a session; cards whose question cannot be built are skipped. */
@@ -213,8 +215,8 @@ export function useStudy(content: ContentIndex | null) {
         (i) => i.region === first.region && i.system === first.system,
       );
       const targets = new Set(items.map((i) => i.conceptId));
-      const all = cardsFor(pool, ["name", "find", "side", "partOf", "spatial"]).filter((c) =>
-        targets.has(c.conceptId),
+      const all = cardsFor(pool, ["name", "find", "side", "partOf", "spatial", "nerve"]).filter(
+        (c) => targets.has(c.conceptId),
       );
       const random = seededRandom(Date.now());
       const queue =
