@@ -6,6 +6,7 @@ import { useUrlViewState } from "@/state/useUrlViewState";
 import { DEFAULT_VIEW_STATE, orderSystems, type Selection } from "@/state/view-state";
 import { ErrorStatus, LoadingStatus } from "@/ui/LoadingStatus";
 import { Header } from "@/ui/Header";
+import { SearchDialog } from "@/ui/SearchDialog";
 import { SystemsPanel } from "@/ui/SystemsPanel";
 import { ViewDock } from "@/ui/ViewDock";
 import type {
@@ -16,7 +17,7 @@ import type {
   ViewPreset,
 } from "@/viewer/AnatomyViewer";
 import { ViewerCanvas } from "@/viewer/ViewerCanvas";
-import type { SystemId } from "@/atlas/types";
+import type { Concept, SystemId } from "@/atlas/types";
 
 const EMPTY: readonly string[] = [];
 
@@ -40,6 +41,7 @@ export default function App() {
   const [ready, setReady] = useState(false);
   const [rotate, setRotate] = useState(false);
   const [systemsOpen, setSystemsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [initialCamera] = useState<CameraPose | null>(view.camera);
   const [insets, setInsets] = useState<Insets>({ top: 96, right: 16, bottom: 120, left: 16 });
 
@@ -119,6 +121,33 @@ export default function App() {
     [update],
   );
 
+  // "/" opens search from anywhere except text fields.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const typing =
+        e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement;
+      if (e.key === "/" && !typing && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const chooseConcept = (concept: Concept) => {
+    setSearchOpen(false);
+    setSystemsOpen(false);
+    setRotate(false);
+    update((s) => ({
+      ...s,
+      selection: { kind: "concept", id: concept.id },
+      isolate: false,
+      explode: 0,
+    }));
+    viewerRef.current?.flyTo(concept.elements);
+  };
+
   const onCameraChange = useCallback(
     (pose: CameraPose) => {
       update((s) => (s.explode === 0 && !s.isolate ? { ...s, camera: pose } : s));
@@ -168,7 +197,7 @@ export default function App() {
       <Header
         ref={headerRef}
         pieces={index?.atlas.parts.length ?? 2234}
-        onSearch={() => {}}
+        onSearch={() => setSearchOpen(true)}
         onAbout={() => {}}
       />
 
@@ -199,6 +228,10 @@ export default function App() {
       <p className="pointer-events-none absolute bottom-6 left-4 z-10 hidden text-xs text-ink-faint xl:block">
         {view.explode > 0.8 ? "Drag to pan" : "Drag to orbit"} · Scroll to zoom · Click a structure
       </p>
+
+      {searchOpen && index && (
+        <SearchDialog index={index} onChoose={chooseConcept} onClose={() => setSearchOpen(false)} />
+      )}
 
       {!ready && !error && <LoadingStatus progress={progress} />}
       {error && <ErrorStatus message={error} />}
