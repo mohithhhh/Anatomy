@@ -29,6 +29,7 @@ describe("view state URL encoding", () => {
       isolate: true,
     };
     expect(decodeViewState(encodeViewState(isolated))).toEqual(isolated);
+    expect(decodeViewState("p=FJ1452M").selection).toEqual({ kind: "part", id: "FJ1452M" });
 
     const exploded: ViewState = { ...DEFAULT_VIEW_STATE, visible: ["skeletal"], explode: 0.4 };
     expect(encodeViewState(exploded)).toBe("sys=skeletal&x=40");

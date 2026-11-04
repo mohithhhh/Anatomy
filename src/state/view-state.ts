@@ -36,7 +36,8 @@ const VIEW_CODES: Record<ViewPreset, string> = {
   side: "side",
   back: "back",
 };
-const ID_PATTERN = /^[A-Za-z]{2,4}\d{1,8}$/;
+// FMA concepts look like FMA9611; BodyParts3D meshes like FJ1252 or FJ1452M.
+const ID_PATTERN = /^[A-Z]{2,4}\d{1,8}[A-Z]?$/;
 
 function sameSystems(a: readonly SystemId[], b: readonly SystemId[]): boolean {
   if (a.length !== b.length) return false;
