@@ -4,6 +4,14 @@ A free 3D anatomy study app. It's open in the browser with no account: explore 2
 
 It has two modes. **Explore** is the 3D atlas. **Study** quizzes you on the model and uses spaced repetition, so cards come back just before you would forget them. See [the product plan](docs/PRODUCT_PLAN.md) for the roadmap.
 
+## Screenshots
+
+| Explore                                                                                       | Isolate a structure                                                                                 |
+| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| ![The full-body model with the systems panel and view controls](docs/screenshots/explore.jpg) | ![The heart isolated, with its detail panel and Quiz me button](docs/screenshots/isolate-heart.jpg) |
+| **Explode into an inventory**                                                                 | **Study**                                                                                           |
+| ![Every bone laid out flat in the exploded view](docs/screenshots/explode.jpg)                | ![Study home with streak, due cards and ready-made decks](docs/screenshots/study-home.jpg)          |
+
 ## Features
 
 ### Explore
