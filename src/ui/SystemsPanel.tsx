@@ -14,10 +14,11 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onChange: (visible: SystemId[]) => void;
+  onLesions: () => void;
 }
 
 export const SystemsPanel = forwardRef<HTMLElement, Props>(function SystemsPanel(
-  { index, visible, visibleCount, open, onClose, onChange },
+  { index, visible, visibleCount, open, onClose, onChange, onLesions },
   ref,
 ) {
   const shown = new Set(visible);
@@ -109,8 +110,15 @@ export const SystemsPanel = forwardRef<HTMLElement, Props>(function SystemsPanel
           );
         })}
       </ul>
-      <div className="flex items-center justify-between border-t border-line px-4 py-2 text-xs text-ink-muted">
+      <div className="flex flex-wrap items-center justify-between gap-x-2 border-t border-line px-4 py-2 text-xs text-ink-muted">
         <span>{visibleCount.toLocaleString("en")} pieces visible</span>
+        <button
+          type="button"
+          onClick={onLesions}
+          className="tap rounded-md px-1.5 py-1 font-medium text-red-700 hover:bg-red-50"
+        >
+          Nerve lesions
+        </button>
         <button
           type="button"
           onClick={() => onChange([])}

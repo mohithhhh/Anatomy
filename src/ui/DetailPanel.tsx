@@ -6,6 +6,8 @@ import { displayName } from "@/atlas/search";
 import { SYSTEM_BY_ID } from "@/atlas/systems";
 import type { Concept } from "@/atlas/types";
 import type { StudyItem } from "@/content/content";
+import { nerveName, type CuratedData } from "@/content/curated";
+import type { FoundDefinition } from "@/content/definitions";
 import { REGION_BY_ID, type RegionId } from "@/content/regions";
 import type { Selection } from "@/state/view-state";
 import { IconButton } from "./IconButton";
@@ -26,7 +28,10 @@ interface Props {
     groups: readonly Concept[];
     siblings: readonly StudyItem[];
     quizCount: number;
+    definition: FoundDefinition | null;
   } | null;
+  curated: CuratedData;
+  onLesion: (nerveId: string) => void;
   onSelectConcept: (conceptId: string) => void;
   onQuiz: () => void;
 }
@@ -66,6 +71,8 @@ export const DetailPanel = forwardRef<HTMLElement, Props>(function DetailPanel(
     info,
     onSelectConcept,
     onQuiz,
+    curated,
+    onLesion,
   },
   ref,
 ) {
@@ -166,13 +173,73 @@ export const DetailPanel = forwardRef<HTMLElement, Props>(function DetailPanel(
           </p>
         )}
 
-        {system && (
+        {info?.definition ? (
           <>
-            <p className="text-sm leading-relaxed text-ink-muted">{system.description}</p>
+            <p className="text-sm leading-relaxed text-ink-muted">{info.definition.definition}</p>
             <p className="mt-1.5 text-[11px] text-ink-faint">
-              System overview. Structure-specific notes are coming.
+              {info.definition.general ? `Definition of ${info.definition.name}. ` : ""}
+              Source: Uberon {info.definition.uberon}, CC BY 3.0.
             </p>
+            {info.definition.synonyms && (
+              <p className="mt-1 text-[11px] text-ink-muted">
+                Also called: {info.definition.synonyms.join(", ")}
+              </p>
+            )}
           </>
+        ) : (
+          system && (
+            <>
+              <p className="text-sm leading-relaxed text-ink-muted">{system.description}</p>
+              <p className="mt-1.5 text-[11px] text-ink-faint">
+                System overview: no structure-specific definition yet.
+              </p>
+            </>
+          )
+        )}
+
+        {info?.item?.muscle && (
+          <div className="mt-3 rounded-xl border border-line p-3">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-[11px] font-semibold tracking-wider text-ink-muted uppercase">
+                {info.item.muscleName}
+              </h3>
+              <span className="rounded bg-amber-100 px-1.5 py-px text-[10px] font-medium text-amber-900">
+                Draft · pending review
+              </span>
+            </div>
+            <dl className="mt-2 space-y-1.5 text-sm">
+              {(
+                [
+                  ["Origin", info.item.muscle.o],
+                  ["Insertion", info.item.muscle.i],
+                  ["Action", info.item.muscle.a],
+                ] as const
+              ).map(([label, value]) => (
+                <div key={label}>
+                  <dt className="text-[11px] text-ink-faint">{label}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+              <div>
+                <dt className="text-[11px] text-ink-faint">Nerve supply</dt>
+                <dd>
+                  {curated.nerves[info.item.muscle.n] ? (
+                    <button
+                      type="button"
+                      onClick={() => onLesion(info.item!.muscle!.n)}
+                      className="tap font-medium text-accent hover:underline"
+                      title="Show what happens if this nerve is injured"
+                    >
+                      {nerveName(curated, info.item.muscle.n)}
+                    </button>
+                  ) : (
+                    nerveName(curated, info.item.muscle.n)
+                  )}{" "}
+                  <span className="text-ink-muted">({info.item.muscle.r})</span>
+                </dd>
+              </div>
+            </dl>
+          </div>
         )}
 
         <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
@@ -264,7 +331,17 @@ export const DetailPanel = forwardRef<HTMLElement, Props>(function DetailPanel(
             FMA entry on BioPortal <ExternalLink size={12} aria-hidden />
           </a>
         )}
-        <p className="mt-2 text-[11px] text-ink-faint">For education only, not clinical use.</p>
+        <p className="mt-2 text-[11px] text-ink-faint">
+          For education only, not clinical use.{" "}
+          <a
+            href={`https://github.com/mohithhhh/anatomy/issues/new?title=${encodeURIComponent(`Content error: ${name}`)}&body=${encodeURIComponent(`Structure: ${name}\nFMA ID: ${conceptId ?? "?"}\nLink: ${window.location.href}\n\nWhat is wrong, and your source:\n`)}`}
+            target="_blank"
+            rel="noreferrer"
+            className="underline hover:text-ink"
+          >
+            Report an error
+          </a>
+        </p>
       </div>
 
       {info && info.quizCount > 0 && (
