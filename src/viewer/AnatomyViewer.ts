@@ -338,6 +338,8 @@ export class AnatomyViewer {
       insets.left === this.insets.left;
     if (same) return;
     this.insets = insets;
+    // Panels moved: keep an offset projection centred on the new clear area.
+    if (this.camera.view?.enabled && !this.state.isolate) this.offsetToClearArea();
     this.dirty = true;
   }
 
@@ -360,8 +362,11 @@ export class AnatomyViewer {
     this.dirty = true;
   }
 
-  /** Smoothly frame the given parts without hiding anything. */
-  flyTo(partIds: readonly string[]): void {
+  /**
+   * Smoothly frame the given parts without hiding anything. `minSize` (metres) keeps some
+   * surroundings in view for very small structures, so a phalanx still shows its hand.
+   */
+  flyTo(partIds: readonly string[], options: { minSize?: number } = {}): void {
     if (this.state.isolate || this.amount > 0.05) return;
     const ids = new Set(partIds);
     const box = new THREE.Box3();
@@ -370,7 +375,7 @@ export class AnatomyViewer {
     });
     if (box.isEmpty()) return;
     const center = box.getCenter(new THREE.Vector3());
-    const diameter = box.getSize(new THREE.Vector3()).length();
+    const diameter = Math.max(box.getSize(new THREE.Vector3()).length(), options.minSize ?? 0);
     // Fit the structure into the area not covered by panels, filling about 60% of it.
     const { availableWidth, availableHeight } = this.offsetToClearArea();
     const w = this.host.clientWidth;
