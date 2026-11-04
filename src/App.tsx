@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { registerAtlasTools } from "@/agent/web-mcp";
 import { loadAtlas, type AtlasIndex } from "@/atlas/atlas-index";
 import { ATLAS_URL, MODEL_BASE } from "@/atlas/model-source";
 import { useIsDesktop } from "@/hooks/useMediaQuery";
@@ -159,6 +160,16 @@ export default function App() {
     }));
     viewerRef.current?.flyTo(concept.elements);
   };
+
+  // Let WebMCP-capable AI agents search and open structures for the user.
+  const chooseRef = useRef(chooseConcept);
+  useLayoutEffect(() => {
+    chooseRef.current = chooseConcept;
+  });
+  useEffect(() => {
+    if (!index) return;
+    return registerAtlasTools(index, (concept) => chooseRef.current(concept));
+  }, [index]);
 
   const onCameraChange = useCallback(
     (pose: CameraPose) => {
