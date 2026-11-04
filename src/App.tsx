@@ -6,6 +6,7 @@ import { useUrlViewState } from "@/state/useUrlViewState";
 import { DEFAULT_VIEW_STATE, orderSystems, type Selection } from "@/state/view-state";
 import { ErrorStatus, LoadingStatus } from "@/ui/LoadingStatus";
 import { Header } from "@/ui/Header";
+import { AboutDialog } from "@/ui/AboutDialog";
 import { DetailPanel } from "@/ui/DetailPanel";
 import { SearchDialog } from "@/ui/SearchDialog";
 import { SystemsPanel } from "@/ui/SystemsPanel";
@@ -43,6 +44,7 @@ export default function App() {
   const [rotate, setRotate] = useState(false);
   const [systemsOpen, setSystemsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [initialCamera] = useState<CameraPose | null>(view.camera);
   const [insets, setInsets] = useState<Insets>({ top: 96, right: 16, bottom: 120, left: 16 });
 
@@ -132,7 +134,8 @@ export default function App() {
     const onKey = (e: KeyboardEvent) => {
       const typing =
         e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement;
-      if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
+      const dialogOpen = document.querySelector('[aria-modal="true"]') !== null;
+      if (typing || dialogOpen || e.metaKey || e.ctrlKey || e.altKey) return;
       if (e.key === "/") {
         e.preventDefault();
         setSearchOpen(true);
@@ -221,7 +224,7 @@ export default function App() {
         ref={headerRef}
         pieces={index?.atlas.parts.length ?? 2234}
         onSearch={() => setSearchOpen(true)}
-        onAbout={() => {}}
+        onAbout={() => setAboutOpen(true)}
       />
 
       {index && (
@@ -268,6 +271,14 @@ export default function App() {
 
       {searchOpen && index && (
         <SearchDialog index={index} onChoose={chooseConcept} onClose={() => setSearchOpen(false)} />
+      )}
+
+      {aboutOpen && (
+        <AboutDialog
+          pieces={index?.atlas.parts.length ?? 2234}
+          concepts={index?.atlas.concepts.length ?? 3432}
+          onClose={() => setAboutOpen(false)}
+        />
       )}
 
       {!ready && !error && <LoadingStatus progress={progress} />}
