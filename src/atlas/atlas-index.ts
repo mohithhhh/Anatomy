@@ -12,7 +12,20 @@ export interface AtlasIndex {
   activeSystems: readonly SystemId[];
 }
 
+/**
+ * Known mistakes in the source data's display systems, fixed by mesh name. Both levator
+ * scapulae muscles are tagged as skeletal in the upstream manifest.
+ */
+const SYSTEM_CORRECTIONS: Record<string, SystemId> = {
+  "Left levator scapulae": "muscular",
+  "Right levator scapulae": "muscular",
+};
+
 export function indexAtlas(atlas: Atlas): AtlasIndex {
+  for (const part of atlas.parts) {
+    const fixed = SYSTEM_CORRECTIONS[part.name];
+    if (fixed) part.system = fixed;
+  }
   const counts = Object.fromEntries(SYSTEMS.map((s) => [s.id, 0])) as Record<SystemId, number>;
   for (const part of atlas.parts) counts[part.system]++;
   return {
