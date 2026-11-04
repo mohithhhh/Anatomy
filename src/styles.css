@@ -34,3 +34,18 @@
     outline-offset: 2px;
   }
 }
+
+/* Tooltip created by the 3D viewer for pieces in the exploded inventory. */
+.viewer-hover {
+  position: absolute;
+  z-index: 5;
+  max-width: 250px;
+  pointer-events: none;
+  border-radius: 8px;
+  background: rgb(15 23 42 / 0.88);
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: white;
+  box-shadow: 0 6px 20px rgb(15 23 42 / 0.18);
+}
