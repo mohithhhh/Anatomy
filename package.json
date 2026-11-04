@@ -6,7 +6,7 @@
   "license": "MIT",
   "type": "module",
   "engines": {
-    "node": ">=22.13.0"
+    "node": ">=22.18.0"
   },
   "scripts": {
     "models": "node scripts/fetch-models.mjs",
@@ -23,7 +23,8 @@
     "test": "vitest run",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm run test",
     "validate:atlas": "node scripts/validate-atlas.mjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "report:content": "node scripts/content-report.ts"
   },
   "dependencies": {
     "clsx": "2.1.1",
