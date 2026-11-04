@@ -2,8 +2,11 @@ import { ExternalLink, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { APP_NAME } from "./Header";
 
+import type { BodyId } from "@/atlas/model-source";
+
 interface Props {
   pieces: number;
+  body: BodyId;
   concepts: number;
   onClose: () => void;
 }
@@ -22,13 +25,17 @@ const LINKS = [
     href: "https://doi.org/10.1093/nar/gkn613",
   },
   {
+    label: "Female: HuBMAP 3D Reference Organ Set v1.5 (CC BY 4.0)",
+    href: "https://doi.org/10.48539/HBM352.BTSQ.586",
+  },
+  {
     label: "Viewer adapted from human-atlas (MIT)",
     href: "https://github.com/ashemag/human-atlas",
   },
   { label: "Full attribution", href: "/ATTRIBUTION.md" },
 ];
 
-export function AboutDialog({ pieces, concepts, onClose }: Props) {
+export function AboutDialog({ pieces, body, concepts, onClose }: Props) {
   const close = useRef<HTMLButtonElement>(null);
   const onCloseRef = useRef(onClose);
   useLayoutEffect(() => {
@@ -83,9 +90,12 @@ export function AboutDialog({ pieces, concepts, onClose }: Props) {
         <div className="mt-3 space-y-3 text-sm leading-relaxed text-ink-muted">
           <p>
             Explore {pieces.toLocaleString("en")} individual meshes and{" "}
-            {concepts.toLocaleString("en")} named structures from an adult male reference anatomy.
-            Free, with no account. Study mode quizzes you and schedules reviews with spaced
-            repetition.
+            {concepts.toLocaleString("en")} named structures in the{" "}
+            {body === "female"
+              ? "female reference organ set (partial skeleton and muscles)"
+              : "adult male reference anatomy"}
+            . Switch bodies at the top left. Free, with no account. Study mode quizzes you and
+            schedules reviews with spaced repetition.
           </p>
           <p>
             The model does not include every human structure or variation. Named structures can
@@ -104,8 +114,9 @@ export function AboutDialog({ pieces, concepts, onClose }: Props) {
           Sources and credits
         </h3>
         <p className="mt-1 text-xs text-ink-muted">
-          BodyParts3D, © The Database Center for Life Science, licensed under CC Attribution 4.0
-          International.
+          Male: BodyParts3D, © The Database Center for Life Science, CC BY 4.0. Female: Kristen
+          Browne and Heidi Schlehlein, Human Reference Atlas / HuBMAP, 3D Reference Organ Set for
+          Female v1.5 (2023), CC BY 4.0.
         </p>
         <ul className="mt-2 space-y-1">
           {LINKS.map((link) => (

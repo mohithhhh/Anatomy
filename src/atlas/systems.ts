@@ -114,14 +114,21 @@ export const SYSTEMS: readonly SystemInfo[] = [
     description:
       "Cartilage, ligaments and other connective tissues support, connect and separate structures, stabilising joints and spreading mechanical loads.",
   },
+  {
+    id: "pregnancy",
+    name: "Pregnancy reference",
+    color: "#c9a2a8",
+    description:
+      "Placental structures from the female reference set, hidden by default. They show the placenta and its vessels, not a full pregnancy.",
+  },
 ];
 
 export const SYSTEM_BY_ID = new Map(SYSTEMS.map((s) => [s.id, s]));
 export const SYSTEM_IDS = SYSTEMS.map((s) => s.id);
 
-/** Everything except the translucent body surface. */
+/** Everything except the translucent body surface and the pregnancy reference. */
 export const DEFAULT_VISIBLE: readonly SystemId[] = SYSTEM_IDS.filter(
-  (id) => id !== "integumentary",
+  (id) => id !== "integumentary" && id !== "pregnancy",
 );
 
 export const PRESETS: readonly { id: string; label: string; systems: readonly SystemId[] }[] = [

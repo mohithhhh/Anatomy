@@ -10,6 +10,7 @@ describe("view state URL encoding", () => {
 
   it("round-trips a full view", () => {
     const state: ViewState = {
+      body: "male",
       visible: ["skeletal", "muscular"],
       selection: { kind: "concept", id: "FMA9611" },
       isolate: false,
@@ -61,6 +62,16 @@ describe("view state URL encoding", () => {
     expect(state.view).toBe("three-quarter");
     expect(state.isolate).toBe(false);
     expect(state.camera).toBeNull();
+  });
+
+  it("encodes the female body and accepts its mesh IDs", () => {
+    const state: ViewState = {
+      ...DEFAULT_VIEW_STATE,
+      body: "female",
+      selection: { kind: "part", id: "VH_F_kidney_capsule_L" },
+    };
+    expect(encodeViewState(state)).toContain("b=f");
+    expect(decodeViewState(encodeViewState(state))).toEqual(state);
   });
 
   it("drops the camera when the view is exploded or isolated", () => {

@@ -244,7 +244,9 @@ export const DetailPanel = forwardRef<HTMLElement, Props>(function DetailPanel(
 
         <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
           <div className="rounded-lg bg-ink/[0.04] px-2.5 py-2">
-            <dt className="text-ink-faint">FMA ID</dt>
+            <dt className="text-ink-faint">
+              {conceptId?.startsWith("FMA") ? "FMA ID" : "Atlas ID"}
+            </dt>
             <dd className="mt-0.5 font-medium text-ink tabular-nums">{conceptId ?? "—"}</dd>
           </div>
           <div className="rounded-lg bg-ink/[0.04] px-2.5 py-2">
@@ -321,7 +323,7 @@ export const DetailPanel = forwardRef<HTMLElement, Props>(function DetailPanel(
           </div>
         )}
 
-        {conceptId && (
+        {conceptId?.startsWith("FMA") && (
           <a
             href={fmaUrl(conceptId)}
             target="_blank"

@@ -21,11 +21,34 @@ const SYSTEM_CORRECTIONS: Record<string, SystemId> = {
   "Right levator scapulae": "muscular",
 };
 
+/**
+ * The female reference set names meshes by Uberon ID, often one ID for both sides and with no
+ * matching named concept. Give each such mesh its own concept (named with its side, from the
+ * _L/_R suffix of its ID) and keep the Uberon ID for definitions.
+ */
+function giveMeshesOwnConcepts(atlas: Atlas) {
+  const known = new Set(atlas.concepts.map((c) => c.id));
+  for (const part of atlas.parts) {
+    if (known.has(part.conceptId)) continue;
+    let name = part.name;
+    if (!/\b(left|right)\b/i.test(name)) {
+      if (part.id.endsWith("_L")) name = `Left ${name}`;
+      else if (part.id.endsWith("_R")) name = `Right ${name}`;
+    }
+    part.name = name.charAt(0).toUpperCase() + name.slice(1);
+    if (part.conceptId.startsWith("UBERON:")) part.uberon = part.conceptId;
+    part.conceptId = part.id;
+    atlas.concepts.push({ id: part.id, name: part.name.toLowerCase(), elements: [part.id] });
+    known.add(part.id);
+  }
+}
+
 export function indexAtlas(atlas: Atlas): AtlasIndex {
   for (const part of atlas.parts) {
     const fixed = SYSTEM_CORRECTIONS[part.name];
     if (fixed) part.system = fixed;
   }
+  giveMeshesOwnConcepts(atlas);
   const counts = Object.fromEntries(SYSTEMS.map((s) => [s.id, 0])) as Record<SystemId, number>;
   for (const part of atlas.parts) counts[part.system]++;
   return {

@@ -100,12 +100,29 @@ export const STARTER_DECKS: readonly (DeckFilter & { name: string })[] = [
     types: ["find", "name", "partOf", "spatial"],
   },
   {
+    name: "Pelvis: reproductive organs",
+    regions: ["pelvis", "abdomen"],
+    systems: ["reproductive"],
+    types: ["find", "name", "side", "spatial"],
+  },
+  {
+    name: "Kidneys and urinary tract",
+    regions: ["abdomen", "pelvis"],
+    systems: ["urinary"],
+    types: ["find", "name", "side", "partOf"],
+  },
+  {
     name: "Head and neck: skull",
     regions: ["head_neck"],
     systems: ["skeletal"],
     types: ["find", "name", "side", "spatial"],
   },
 ];
+
+/** Starter decks with enough structures in the current body (the two bodies differ a lot). */
+export function availableStarters(content: ContentIndex, minimum = 10) {
+  return STARTER_DECKS.filter((d) => deckItems(content, d).length >= minimum);
+}
 
 // ---------------------------------------------------------------------------------------------
 // Share links: #study=1&n=Upper%20limb&r=upper_limb&s=skeletal&t=find,name
