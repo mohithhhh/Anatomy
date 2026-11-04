@@ -730,7 +730,8 @@ export class AnatomyViewer {
     this.frame = requestAnimationFrame(this.animate);
     if (!this.sized) return;
     const now = performance.now();
-    const dt = Math.min((now - this.lastTime) / 1000, 0.05);
+    const elapsed = (now - this.lastTime) / 1000;
+    const dt = Math.min(elapsed, 0.05);
     this.lastTime = now;
     const s = this.state;
 
@@ -763,7 +764,8 @@ export class AnatomyViewer {
       this.isolateKey = isolateKey;
     }
 
-    if (this.tween) this.stepTween(dt);
+    // Real elapsed time, so camera moves keep their duration on slow devices.
+    if (this.tween) this.stepTween(elapsed);
 
     const flat = this.amount >= 0.8;
     this.controls.enableRotate = !flat;
