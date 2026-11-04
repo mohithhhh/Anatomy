@@ -51,6 +51,20 @@ export interface Summary {
   nextDue: number | null;
 }
 
+/** A timed practical exam: tagged structures, typed answers, no feedback until the end. */
+export interface Exam {
+  title: string;
+  stations: Question[];
+  index: number;
+  answers: { typed: string; grade: TypedGrade; ms: number }[];
+  stationStart: number;
+  /** Seconds per station. */
+  seconds: number;
+}
+
+export const EXAM_STATIONS = 10;
+export const EXAM_SECONDS = 60;
+
 export interface Overview {
   streak: number;
   reviewedToday: number;
@@ -74,6 +88,7 @@ export function useStudy(content: ContentIndex | null, curated: CuratedData = EM
   });
   const [session, setSession] = useState<Session | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
+  const [exam, setExam] = useState<Exam | null>(null);
 
   useEffect(() => {
     const status = { cancelled: false };
@@ -350,6 +365,95 @@ export function useStudy(content: ContentIndex | null, curated: CuratedData = EM
 
   const closeSummary = useCallback(() => setSummary(null), []);
 
+  const startExam = useCallback(
+    async (deck: Deck) => {
+      if (!content || !store.current) return;
+      const pool = deckItems(content, deck);
+      const random = seededRandom(Date.now());
+      const stations = shuffle(pool, random)
+        .map((item) =>
+          question(
+            { id: `name:${item.conceptId}`, type: "name", conceptId: item.conceptId },
+            pool,
+            deck.systems,
+          ),
+        )
+        .filter((q): q is Question => q !== null)
+        .slice(0, EXAM_STATIONS);
+      if (!stations.length) return;
+      setSummary(null);
+      setSession(null);
+      track("Practical exam started", { stations: stations.length });
+      setExam({
+        title: deck.name,
+        stations,
+        index: 0,
+        answers: [],
+        stationStart: Date.now(),
+        seconds: EXAM_SECONDS,
+      });
+    },
+    [content, question],
+  );
+
+  /** Submit the current station (an empty answer counts as wrong) and move on. */
+  const submitExam = useCallback((typed: string) => {
+    setExam((e) => {
+      if (!e || e.index >= e.stations.length) return e;
+      const q = e.stations[e.index]!;
+      const grade = gradeTyped(typed, q.typedAnswer ?? "");
+      const ms = Date.now() - e.stationStart;
+      const s = store.current;
+      if (s) {
+        const prev = states.current.get(q.card.id);
+        void recordAnswer(
+          s,
+          q.card,
+          prev,
+          grade === "wrong" ? 1 : 3,
+          grade !== "wrong",
+          ms,
+          Date.now(),
+        ).then((updated) => states.current.set(q.card.id, updated));
+      }
+      return {
+        ...e,
+        index: e.index + 1,
+        answers: [...e.answers, { typed, grade, ms }],
+        stationStart: Date.now(),
+      };
+    });
+  }, []);
+
+  /** A normal session over the stations someone got wrong. */
+  const reviewMissed = useCallback(
+    (missed: Question[]) => {
+      if (!content || !missed.length) return;
+      const items = missed
+        .map((q) => content.byConcept.get(q.card.conceptId))
+        .filter((i): i is StudyItem => i !== undefined);
+      const queue = items.flatMap((i) => [
+        { id: `name:${i.conceptId}`, type: "name" as const, conceptId: i.conceptId },
+        { id: `find:${i.conceptId}`, type: "find" as const, conceptId: i.conceptId },
+      ]);
+      begin(
+        "Exam misses",
+        null,
+        queue,
+        content.items.filter((i) =>
+          items.some((m) => m.region === i.region && m.system === i.system),
+        ),
+        [...new Set(items.map((i) => i.system))],
+      );
+    },
+    [content, begin],
+  );
+
+  const closeExam = useCallback(() => {
+    setExam(null);
+    void refresh();
+  }, [refresh]);
+
   const dueTotal = useMemo(
     () => [...overview.stats.values()].reduce((n, s) => n + s.due, 0),
     [overview],
@@ -374,6 +478,11 @@ export function useStudy(content: ContentIndex | null, curated: CuratedData = EM
     next,
     exit,
     closeSummary,
+    exam,
+    startExam,
+    submitExam,
+    closeExam,
+    reviewMissed,
   };
 }
 
