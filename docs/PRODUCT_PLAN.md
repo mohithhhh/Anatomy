@@ -149,6 +149,27 @@ The PDF's eight gaps are included. New ideas are marked **NEW**.
 
 **Exit criteria:** launch to 2 or 3 student cohorts (one real course is enough). Target 25% or more of users returning on day 7, and recall accuracy on due cards rising over two weeks.
 
+**Status (Nov 4, 2026): built; the exit criteria need real students.**
+
+- **Done, steps 1–8:**
+  - 1,654 study items with regions, sides and part-of.
+  - All six question types, including directions generated from the model.
+  - FSRS scheduling with progress saved in IndexedDB.
+  - The deck builder, shareable deck links and five starter decks.
+  - The info panel with "Quiz me on this".
+  - Optional cookie-free analytics.
+- **Changes from the plan:**
+  - Content is derived in the browser at load time (about 70 ms), not in a build step. `scripts/content-report.ts` writes the region report for review instead.
+  - Part-of comes from FMA names ("X of Y"), because the model's concept groups are mostly "is a kind of" categories.
+  - "Click the structure anterior to X" was not built. It needs a clear definition of "directly" anterior. The other direction questions (binary choices) are built.
+- **Data fixes:**
+  - The levator scapulae muscles were tagged as skeletal upstream; they are now muscles.
+  - The first region review fixed brain, eyelid, pelvic-floor and back-muscle tags.
+- **Open:**
+  - A clinician or anatomy teacher should read `docs/content/regions-report.md`.
+  - Pilot with 2 or 3 student groups.
+  - Set `VITE_PLAUSIBLE_DOMAIN` to measure day-7 return.
+
 ### Phase 3: Content depth (about 4 weeks)
 
 **Goal:** clicking any commonly studied structure tells you what it is and what it does, with sources.
