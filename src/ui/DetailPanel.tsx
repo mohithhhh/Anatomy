@@ -1,9 +1,12 @@
 import { clsx } from "clsx";
-import { Check, ChevronRight, ExternalLink, Focus, Link2, X } from "lucide-react";
+import { Check, ChevronRight, ExternalLink, Focus, GraduationCap, Link2, X } from "lucide-react";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import type { AtlasIndex } from "@/atlas/atlas-index";
 import { displayName } from "@/atlas/search";
 import { SYSTEM_BY_ID } from "@/atlas/systems";
+import type { Concept } from "@/atlas/types";
+import type { StudyItem } from "@/content/content";
+import { REGION_BY_ID, type RegionId } from "@/content/regions";
 import type { Selection } from "@/state/view-state";
 import { IconButton } from "./IconButton";
 
@@ -16,6 +19,31 @@ interface Props {
   onSelectPart: (id: string) => void;
   onClose: () => void;
   onCopyLink: () => Promise<void>;
+  /** Study content for this selection, when there is any. */
+  info: {
+    item: StudyItem | undefined;
+    regions: readonly RegionId[];
+    groups: readonly Concept[];
+    siblings: readonly StudyItem[];
+    quizCount: number;
+  } | null;
+  onSelectConcept: (conceptId: string) => void;
+  onQuiz: () => void;
+}
+
+const MAX_SIBLINGS = 8;
+
+function LinkRow({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="tap flex w-full items-center gap-2 rounded-md px-1.5 py-1.5 text-left text-sm hover:bg-ink/5"
+    >
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+      <ChevronRight size={14} className="shrink-0 text-ink-faint" aria-hidden />
+    </button>
+  );
 }
 
 const MAX_LISTED = 50;
@@ -26,7 +54,19 @@ function fmaUrl(conceptId: string) {
 }
 
 export const DetailPanel = forwardRef<HTMLElement, Props>(function DetailPanel(
-  { index, selection, partIds, isolated, onIsolate, onSelectPart, onClose, onCopyLink },
+  {
+    index,
+    selection,
+    partIds,
+    isolated,
+    onIsolate,
+    onSelectPart,
+    onClose,
+    onCopyLink,
+    info,
+    onSelectConcept,
+    onQuiz,
+  },
   ref,
 ) {
   const title = useRef<HTMLHeadingElement>(null);
@@ -43,11 +83,11 @@ export const DetailPanel = forwardRef<HTMLElement, Props>(function DetailPanel(
   const conceptId = concept?.id ?? part?.conceptId;
   const pieces = partIds.map((id) => index.parts.get(id)).filter((p) => p !== undefined);
 
-  // Move focus to the title when the selection changes, for keyboard and screen-reader users.
+  // The panel remounts per selection (keyed by the caller): focus the title for keyboard and
+  // screen-reader users.
   useEffect(() => {
     title.current?.focus({ preventScroll: true });
-    setCopied(false);
-  }, [selection.id]);
+  }, []);
 
   const copy = async () => {
     await onCopyLink();
@@ -86,6 +126,46 @@ export const DetailPanel = forwardRef<HTMLElement, Props>(function DetailPanel(
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-2 pb-3 select-text">
+        {info && (info.regions.length > 0 || info.item?.side) && (
+          <div className="mb-2 flex flex-wrap gap-1.5 text-xs">
+            {info.regions.slice(0, 3).map((r) => (
+              <span
+                key={r}
+                className="rounded-md bg-accent-soft/70 px-2 py-0.5 font-medium text-accent"
+              >
+                {REGION_BY_ID.get(r)!.name}
+              </span>
+            ))}
+            {info.regions.length > 3 && (
+              <span className="rounded-md bg-ink/[0.05] px-2 py-0.5 text-ink-muted">
+                +{info.regions.length - 3} regions
+              </span>
+            )}
+            {info.item?.side && (
+              <span className="rounded-md bg-ink/[0.05] px-2 py-0.5 text-ink-muted">
+                {info.item.side === "left" ? "Left side" : "Right side"}
+              </span>
+            )}
+          </div>
+        )}
+
+        {info?.item?.parentName && (
+          <p className="mb-2 text-sm">
+            <span className="text-ink-muted">Part of </span>
+            {info.item.parentId ? (
+              <button
+                type="button"
+                onClick={() => onSelectConcept(info.item!.parentId!)}
+                className="tap font-medium text-accent hover:underline"
+              >
+                {info.item.parentName}
+              </button>
+            ) : (
+              <span className="font-medium">{info.item.parentName}</span>
+            )}
+          </p>
+        )}
+
         {system && (
           <>
             <p className="text-sm leading-relaxed text-ink-muted">{system.description}</p>
@@ -135,6 +215,45 @@ export const DetailPanel = forwardRef<HTMLElement, Props>(function DetailPanel(
           </div>
         )}
 
+        {info && info.siblings.length > 0 && (
+          <div className="mt-3">
+            <h3 className="mb-1 text-[11px] font-semibold tracking-wider text-ink-muted uppercase">
+              Other parts of {info.item?.parentName?.toLowerCase() ?? "this structure"}
+            </h3>
+            <div className="-mx-1.5">
+              {info.siblings.slice(0, MAX_SIBLINGS).map((s) => (
+                <LinkRow
+                  key={s.conceptId}
+                  label={s.name}
+                  onClick={() => onSelectConcept(s.conceptId)}
+                />
+              ))}
+            </div>
+            {info.siblings.length > MAX_SIBLINGS && (
+              <p className="mt-1 text-xs text-ink-faint">
+                And {info.siblings.length - MAX_SIBLINGS} more.
+              </p>
+            )}
+          </div>
+        )}
+
+        {info && info.groups.length > 0 && (
+          <div className="mt-3">
+            <h3 className="mb-1 text-[11px] font-semibold tracking-wider text-ink-muted uppercase">
+              Belongs to
+            </h3>
+            <div className="-mx-1.5">
+              {info.groups.map((g) => (
+                <LinkRow
+                  key={g.id}
+                  label={displayName(g.name)}
+                  onClick={() => onSelectConcept(g.id)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         {conceptId && (
           <a
             href={fmaUrl(conceptId)}
@@ -148,6 +267,18 @@ export const DetailPanel = forwardRef<HTMLElement, Props>(function DetailPanel(
         <p className="mt-2 text-[11px] text-ink-faint">For education only, not clinical use.</p>
       </div>
 
+      {info && info.quizCount > 0 && (
+        <div className="shrink-0 border-t border-line px-2 pt-2">
+          <button
+            type="button"
+            onClick={onQuiz}
+            className="tap flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-accent-soft text-sm font-medium text-accent hover:bg-accent-soft/70"
+          >
+            <GraduationCap size={17} aria-hidden />
+            {info.quizCount === 1 ? "Quiz me on this" : `Quiz me on these ${info.quizCount}`}
+          </button>
+        </div>
+      )}
       <div className="flex shrink-0 gap-2 border-t border-line p-2">
         <button
           type="button"
