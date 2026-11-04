@@ -26,6 +26,7 @@ test("the cross-section slicer cuts and can be removed", async ({ page }) => {
 });
 
 test("a practical exam runs ten stations and shows the score", async ({ page }) => {
+  test.slow(); // long flow; software WebGL in CI is slow
   await openAtlas(page, "#study=1&n=Arm%20bones&r=upper_limb&s=skeletal&t=name");
   await page.getByRole("button", { name: "Exam" }).click();
   const exam = page.locator("section[aria-label='Practical exam']");

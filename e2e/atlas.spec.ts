@@ -67,6 +67,7 @@ test("unknown structures in a link are ignored", async ({ page }) => {
 });
 
 test("explode moves to the inventory and reset restores the default", async ({ page }) => {
+  test.slow(); // long flow; software WebGL in CI is slow
   await openAtlas(page, "#sys=skeletal");
   await page.locator("#explode").fill("100");
   await expect.poll(() => hashOf(page)).toContain("x=100");
