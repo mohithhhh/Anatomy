@@ -1,0 +1,61 @@
+{
+  "$comment": "Hand-curated from standard anatomy references (Moore's Clinically Oriented Anatomy, Gray's Anatomy). DRAFT: not yet reviewed by an anatomist. Report errors via the app.",
+  "status": "draft",
+  "nerves": {
+    "axillary": {
+      "name": "Axillary nerve",
+      "roots": "C5–C6",
+      "lesion": "Weak shoulder abduction beyond 15°, flattened shoulder contour, numb patch over the lateral upper arm (regimental badge area). Classic cause: fracture of the surgical neck of the humerus or shoulder dislocation."
+    },
+    "musculocutaneous": {
+      "name": "Musculocutaneous nerve",
+      "roots": "C5–C7",
+      "lesion": "Weak elbow flexion and supination; reduced biceps reflex; numb lateral forearm."
+    },
+    "radial": {
+      "name": "Radial nerve",
+      "roots": "C5–T1",
+      "lesion": "Wrist drop: cannot extend the wrist or fingers at the knuckles; weak elbow extension if injured high in the arm. Classic cause: fracture of the humeral shaft (radial groove)."
+    },
+    "median": {
+      "name": "Median nerve",
+      "roots": "C6–T1",
+      "lesion": "High injury: weak forearm pronation and flexion of the lateral fingers (hand of benediction on making a fist). At the wrist (carpal tunnel): weak thumb opposition, thenar wasting, numb lateral three and a half digits."
+    },
+    "ulnar": {
+      "name": "Ulnar nerve",
+      "roots": "C8–T1",
+      "lesion": "Claw hand of the ring and little fingers, weak finger abduction and adduction, weak thumb adduction (Froment's sign), numb medial one and a half digits. Classic cause: injury at the medial epicondyle."
+    },
+    "femoral": {
+      "name": "Femoral nerve",
+      "roots": "L2–L4",
+      "lesion": "Weak knee extension and hip flexion, lost knee-jerk reflex, numb anterior thigh and medial leg."
+    },
+    "obturator": {
+      "name": "Obturator nerve",
+      "roots": "L2–L4",
+      "lesion": "Weak thigh adduction; the leg swings outward when walking; numb patch on the medial thigh."
+    },
+    "superior_gluteal": {
+      "name": "Superior gluteal nerve",
+      "roots": "L4–S1",
+      "lesion": "Weak hip abduction: positive Trendelenburg sign, the pelvis drops on the opposite side when standing on the affected leg."
+    },
+    "inferior_gluteal": {
+      "name": "Inferior gluteal nerve",
+      "roots": "L5–S2",
+      "lesion": "Weak hip extension: difficulty rising from a chair or climbing stairs."
+    },
+    "sciatic_tibial": {
+      "name": "Tibial nerve (sciatic, tibial part)",
+      "roots": "L4–S3",
+      "lesion": "Weak knee flexion (hamstrings), lost plantarflexion and toe flexion, cannot stand on tiptoe, numb sole."
+    },
+    "common_fibular": {
+      "name": "Common fibular nerve",
+      "roots": "L4–S2",
+      "lesion": "Foot drop: cannot dorsiflex or evert the foot, high-stepping gait, numb dorsum of the foot. Classic cause: injury at the neck of the fibula."
+    }
+  }
+}

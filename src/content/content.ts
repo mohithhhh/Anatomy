@@ -1,6 +1,7 @@
 import type { AtlasIndex } from "../atlas/atlas-index.ts";
 import type { Concept, Part, SystemId } from "../atlas/types.ts";
 import { buildContainers } from "./containers.ts";
+import { EMPTY_CURATED, withoutSide, type CuratedData, type MuscleCard } from "./curated.ts";
 import { sideOf, type Side } from "./laterality.ts";
 import { regionOfPart, type RegionId } from "./regions.ts";
 
@@ -33,6 +34,10 @@ export interface StudyItem {
   parentName: string | null;
   /** Concept ID of that parent, when the atlas has it as a structure of its own. */
   parentId: string | null;
+  /** Curated muscle card (the item's own, or its parent muscle's). */
+  muscle?: MuscleCard;
+  /** Name of the muscle the card belongs to. */
+  muscleName?: string;
 }
 
 export interface ContentIndex {
@@ -83,14 +88,10 @@ export function parentFromName(name: string): string | null {
   return parent.length > 2 ? sentenceCase(parent) : null;
 }
 
-const withoutSide = (name: string) =>
-  name
-    .toLowerCase()
-    .replace(/\b(left|right)\b/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-
-export function buildContent(index: AtlasIndex): ContentIndex {
+export function buildContent(
+  index: AtlasIndex,
+  curated: CuratedData = EMPTY_CURATED,
+): ContentIndex {
   const containers = buildContainers(index.atlas);
   // Skip groups that only drop the side ("long head of biceps brachii" for the left one): they
   // are poor answers to "what is this part of?".
@@ -142,6 +143,15 @@ export function buildContent(index: AtlasIndex): ContentIndex {
   const conceptByName = new Map(index.atlas.concepts.map((c) => [c.name.toLowerCase(), c.id]));
   for (const item of items) {
     if (item.parentName) item.parentId = conceptByName.get(item.parentName.toLowerCase()) ?? null;
+    for (const name of [item.name, item.parentName]) {
+      const key = name ? withoutSide(name) : "";
+      const card = curated.muscles[key];
+      if (item.system === "muscular" && card) {
+        item.muscle = card;
+        item.muscleName = sentenceCase(key.replace(/ muscle$/, ""));
+        break;
+      }
+    }
   }
   const byPart = new Map<string, StudyItem>();
   for (const item of items) for (const id of item.partIds) byPart.set(id, item);
