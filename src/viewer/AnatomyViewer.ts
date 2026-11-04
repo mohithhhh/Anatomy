@@ -17,6 +17,27 @@ import { PointerTap } from "./pointer-tap";
 
 export type ViewPreset = "three-quarter" | "front" | "side" | "back";
 
+/** Cross-section planes: axial (horizontal), sagittal (left/right), coronal (front/back). */
+export type SliceAxis = "axial" | "sagittal" | "coronal";
+export interface Slice {
+  axis: SliceAxis;
+  /** 0–1 across the body along that axis. */
+  position: number;
+}
+
+// Body extent along each axis (metres). Axial keeps what is below the cut, sagittal what is to
+// the body's right of it, coronal what is behind it, so the cut face points at the default camera.
+const SLICE_RANGE: Record<SliceAxis, [number, number]> = {
+  axial: [0.02, 1.74],
+  sagittal: [-0.32, 0.32],
+  coronal: [-0.16, 0.16],
+};
+const SLICE_NORMAL: Record<SliceAxis, [number, number, number]> = {
+  axial: [0, -1, 0],
+  sagittal: [-1, 0, 0],
+  coronal: [0, 0, -1],
+};
+
 export interface SceneState {
   /** Systems shown. */
   visible: readonly SystemId[];
@@ -157,6 +178,7 @@ export class AnatomyViewer {
   private userDriven = false;
   private cameraTimer: ReturnType<typeof setTimeout> | undefined;
   private tween: Tween | null = null;
+  private clipPlane: THREE.Plane | null = null;
 
   constructor(host: HTMLElement, atlas: Atlas, options: ViewerOptions) {
     this.host = host;
@@ -340,6 +362,22 @@ export class AnatomyViewer {
     this.insets = insets;
     // Panels moved: keep an offset projection centred on the new clear area.
     if (this.camera.view?.enabled && !this.state.isolate) this.offsetToClearArea();
+    this.dirty = true;
+  }
+
+  /** Cut the body with a plane, or pass null to remove the cut. Cut faces are not capped. */
+  setSlice(slice: Slice | null): void {
+    if (!slice) {
+      this.clipPlane = null;
+      this.renderer.clippingPlanes = [];
+    } else {
+      const [min, max] = SLICE_RANGE[slice.axis];
+      const at = min + (max - min) * THREE.MathUtils.clamp(slice.position, 0, 1);
+      const normal = new THREE.Vector3(...SLICE_NORMAL[slice.axis]);
+      // Keep points where normal·p + constant ≥ 0, i.e. on the far side of the cut.
+      this.clipPlane = new THREE.Plane(normal, at);
+      this.renderer.clippingPlanes = [this.clipPlane];
+    }
     this.dirty = true;
   }
 
@@ -797,7 +835,7 @@ export class AnatomyViewer {
     this.controls.enableRotate = !flat;
     this.controls.mouseButtons.LEFT = flat ? THREE.MOUSE.PAN : THREE.MOUSE.ROTATE;
     this.controls.touches.ONE = flat ? THREE.TOUCH.PAN : THREE.TOUCH.ROTATE;
-    const showStage = this.amount < 0.5 && !s.isolate;
+    const showStage = this.amount < 0.5 && !s.isolate && !this.clipPlane;
     for (const object of this.stage) object.visible = showStage;
     this.markers.visible = this.amount > 0.75;
     this.controls.autoRotate = s.rotate && !s.isolate && this.amount < 0.4;
@@ -984,7 +1022,9 @@ export class AnatomyViewer {
       if (hasSolid && this.atlas.parts[i]!.system === "integumentary") return;
       worldBox.copy(this.bounds[i]!).translate(mesh.position);
       if (!this.raycaster.ray.intersectBox(worldBox, hitPoint)) return;
-      const hit = this.raycaster.intersectObject(mesh, false)[0];
+      const hit = this.raycaster
+        .intersectObject(mesh, false)
+        .find((h) => !this.clipPlane || this.clipPlane.distanceToPoint(h.point) >= 0);
       if (hit && hit.distance < nearest) {
         nearest = hit.distance;
         found = i;
