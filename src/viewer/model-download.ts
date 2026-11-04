@@ -1,0 +1,24 @@
+// Adapted from human-atlas (MIT). See LICENSE.human-atlas.
+
+/**
+ * Static hosts may serve a .gz file either as-is or with `Content-Encoding: gzip`, in which case
+ * fetch has already decoded it. Check the gzip magic bytes so we never decode twice.
+ */
+export async function decodeModelResponse(
+  response: Response,
+  expectedBytes: number,
+): Promise<ArrayBuffer> {
+  if (!response.ok) throw new Error("An anatomy file could not be loaded.");
+  const payload = await response.arrayBuffer();
+  const signature = new Uint8Array(payload, 0, Math.min(2, payload.byteLength));
+  const gzipped = signature[0] === 0x1f && signature[1] === 0x8b;
+  const buffer = gzipped
+    ? await new Response(
+        new Blob([payload]).stream().pipeThrough(new DecompressionStream("gzip")),
+      ).arrayBuffer()
+    : payload;
+  if (buffer.byteLength !== expectedBytes) {
+    throw new Error("An anatomy file was incomplete. Please reload the page.");
+  }
+  return buffer;
+}
