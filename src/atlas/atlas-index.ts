@@ -1,5 +1,5 @@
-import { SYSTEMS } from "./systems";
-import type { Atlas, Concept, Part, SystemId } from "./types";
+import { SYSTEMS } from "./systems.ts";
+import type { Atlas, Concept, Part, SystemId } from "./types.ts";
 
 /** Lookup tables built once after the atlas loads. */
 export interface AtlasIndex {
