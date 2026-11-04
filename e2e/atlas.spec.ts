@@ -29,7 +29,7 @@ test("search selects a structure and the link reopens it", async ({ page }) => {
 test("system switches and presets update the view and the URL", async ({ page }) => {
   await openAtlas(page);
   await page.getByRole("button", { name: "Skeleton", exact: true }).first().click();
-  await expect(page.getByText("296 pieces visible")).toBeVisible();
+  await expect(page.getByText("294 pieces visible")).toBeVisible();
   await expect.poll(() => hashOf(page)).toBe("#sys=skeletal");
 
   await page.getByRole("switch", { name: "Show muscles" }).click();

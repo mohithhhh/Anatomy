@@ -338,6 +338,8 @@ export class AnatomyViewer {
       insets.left === this.insets.left;
     if (same) return;
     this.insets = insets;
+    // Panels moved: keep an offset projection centred on the new clear area.
+    if (this.camera.view?.enabled && !this.state.isolate) this.offsetToClearArea();
     this.dirty = true;
   }
 
@@ -360,8 +362,11 @@ export class AnatomyViewer {
     this.dirty = true;
   }
 
-  /** Smoothly frame the given parts without hiding anything. */
-  flyTo(partIds: readonly string[]): void {
+  /**
+   * Smoothly frame the given parts without hiding anything. `minSize` (metres) keeps some
+   * surroundings in view for very small structures, so a phalanx still shows its hand.
+   */
+  flyTo(partIds: readonly string[], options: { minSize?: number } = {}): void {
     if (this.state.isolate || this.amount > 0.05) return;
     const ids = new Set(partIds);
     const box = new THREE.Box3();
@@ -370,8 +375,20 @@ export class AnatomyViewer {
     });
     if (box.isEmpty()) return;
     const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3()).length();
-    const distance = THREE.MathUtils.clamp(size / this.fovTan() / 0.62, 0.25, 4.5);
+    const diameter = Math.max(box.getSize(new THREE.Vector3()).length(), options.minSize ?? 0);
+    // Fit the structure into the area not covered by panels, filling about 60% of it.
+    const { availableWidth, availableHeight } = this.offsetToClearArea();
+    const w = this.host.clientWidth;
+    const h = this.host.clientHeight;
+    const fill = 0.6 * this.fovTan();
+    const distance = THREE.MathUtils.clamp(
+      Math.max(
+        diameter / (fill * (availableHeight / h)),
+        diameter / (fill * this.camera.aspect * (availableWidth / w)),
+      ),
+      0.2,
+      4.5,
+    );
     const direction = this.camera.position.clone().sub(this.controls.target).normalize();
     this.tween = {
       fromPosition: this.camera.position.clone(),
@@ -619,6 +636,7 @@ export class AnatomyViewer {
 
   /** Frame the whole body (extent 0) or the exploded inventory (extent 1). */
   private fit(view: ViewPreset, extent = 0): void {
+    this.camera.clearViewOffset();
     const el = this.host;
     const width = el.clientWidth;
     const height = el.clientHeight;
@@ -656,6 +674,21 @@ export class AnatomyViewer {
     this.dirty = true;
   }
 
+  /** Centre the projection on the area between the panels. */
+  private offsetToClearArea(): { availableWidth: number; availableHeight: number } {
+    const w = this.host.clientWidth;
+    const h = this.host.clientHeight;
+    const left = this.insets.left;
+    const right = w - this.insets.right;
+    const top = this.insets.top;
+    const bottom = h - this.insets.bottom;
+    this.camera.setViewOffset(w, h, w / 2 - (left + right) / 2, h / 2 - (top + bottom) / 2, w, h);
+    return {
+      availableWidth: Math.max(150, right - left),
+      availableHeight: Math.max(40, bottom - top),
+    };
+  }
+
   private frameIsolated(): void {
     const box = new THREE.Box3();
     const selected = new Set(this.state.selected);
@@ -670,14 +703,7 @@ export class AnatomyViewer {
     const size = box.getSize(new THREE.Vector3());
     const w = this.host.clientWidth;
     const h = this.host.clientHeight;
-    const left = this.insets.left;
-    const right = w - this.insets.right;
-    const top = this.insets.top;
-    const bottom = h - this.insets.bottom;
-    const availableWidth = Math.max(150, right - left);
-    const availableHeight = Math.max(40, bottom - top);
-    // Shift the projection centre into the clear area between the panels.
-    this.camera.setViewOffset(w, h, w / 2 - (left + right) / 2, h / 2 - (top + bottom) / 2, w, h);
+    const { availableWidth, availableHeight } = this.offsetToClearArea();
     const distance = Math.max(
       0.07,
       (Math.max(

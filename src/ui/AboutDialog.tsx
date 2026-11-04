@@ -84,12 +84,17 @@ export function AboutDialog({ pieces, concepts, onClose }: Props) {
           <p>
             Explore {pieces.toLocaleString("en")} individual meshes and{" "}
             {concepts.toLocaleString("en")} named structures from an adult male reference anatomy.
-            Free, with no account. Quizzes and spaced repetition are next.
+            Free, with no account. Study mode quizzes you and schedules reviews with spaced
+            repetition.
           </p>
           <p>
             The model does not include every human structure or variation. Named structures can
             contain several pieces. Colours and system groupings are chosen for study, and geometry
             is simplified for the web.
+          </p>
+          <p className="text-xs">
+            Privacy: study progress stays in this browser. If usage statistics are enabled they are
+            anonymous, cookie-free, and never include what you selected or studied.
           </p>
           <p className="rounded-lg bg-ink/[0.04] px-3 py-2 text-xs">
             For education only. This is not a diagnostic, clinical or surgical reference.
