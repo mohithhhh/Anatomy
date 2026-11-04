@@ -122,6 +122,13 @@ The PDF's eight gaps are included. New ideas are marked **NEW**.
 
 **Exit criteria:** feature parity with Human Atlas on desktop and a mid-range Android phone, every check passing in CI, and a deep link that reopens the exact same view.
 
+**Status (Nov 4, 2026): built, two items open.**
+
+- Done: steps 1–7. Also built: search ranked by word order, ID and prefix; fly-to on search; copy link; WebMCP tools; quiz-ready `setHighlights` in the viewer API.
+- Done: unit tests (layout, tap detection, URL state, search, WebMCP) and 10 Playwright browser tests, run in CI on every push.
+- Open: step 8, the content license decision.
+- Open: testing on a real mid-range Android phone. Layouts are only checked in headless Chromium at phone sizes.
+
 ### Phase 2: Study MVP (about 4 weeks) → public launch
 
 **Goal:** a student can study a region for two weeks and measurably remember more.
