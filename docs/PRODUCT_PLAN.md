@@ -183,6 +183,19 @@ The PDF's eight gaps are included. New ideas are marked **NEW**.
 
 **Exit criteria:** all limb muscles fully carded and reviewed, and the top 500 concepts defined.
 
+**Status (Nov 4, 2026): built except the expert review.**
+
+- **Done:**
+  - Definitions come from Uberon (CC BY 3.0) through its FMA cross-references: 959 atlas concepts, so 923 of 1,654 study items have one (the general definition for sided structures).
+  - Info panel v1: definition with its source, synonyms, muscle cards and Report an error (a prefilled GitHub issue).
+  - 75 limb muscle cards and 11 nerves, stored as JSON in `data/content/`.
+  - Nerve-supply questions.
+- **Not built:**
+  - The Latin/English toggle and translated labels. Uberon has no Latin names here, and Wikidata is not reachable from the build environment.
+  - The coverage dashboard. Coverage is reported in tests and this note instead.
+  - Blood supply on the muscle cards.
+- **Open:** an anatomist must review `data/content/muscles.json` and `nerves.json`. Until then every card is labelled as a draft.
+
 ### Phase 4: Exam-ready and clinical (about 5 weeks)
 
 **Goal:** the best free tool for anatomy practical exams. This is the headline for the next marketing push.
@@ -195,6 +208,22 @@ The PDF's eight gaps are included. New ideas are marked **NEW**.
 6. **Accessibility.** Keyboard navigation through the structure tree, screen-reader labels, high-contrast mode, and quizzes playable without the 3D view.
 
 **Exit criteria:** the exam simulator is used by at least one cohort before a real practical exam, and first load on a low-end phone is under 5 seconds for the skeleton.
+
+**Status (Nov 4, 2026): mostly built.**
+
+- **Done:**
+  - Practical-exam simulator: 10 stations, 60 s each, typed answers, results, review misses.
+  - Lesion mode for 11 limb nerves.
+  - Cross-section slicer (axial, sagittal, coronal).
+  - Anki export as text cards with links back.
+  - Offline support (manifest and service worker).
+- **Not built:**
+  - Sharing exam station sets by link. Any deck link works as an exam source.
+  - Capped cut faces and the "name the structures in this slice" quiz.
+  - Images in Anki cards.
+  - Skeleton-first streaming: the model still loads as 15 chunks in parallel.
+  - Low-end Android timing, which needs real devices.
+  - A full accessibility pass: quizzes and panels are keyboard and screen-reader friendly, but the 3D view has no structure tree yet.
 
 ### Phase 5: AI, teaching and reach (about 6 weeks, then ongoing)
 

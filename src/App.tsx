@@ -5,6 +5,10 @@ import { loadAtlas, type AtlasIndex } from "@/atlas/atlas-index";
 import { ATLAS_URL, MODEL_BASE } from "@/atlas/model-source";
 import type { Concept, SystemId } from "@/atlas/types";
 import { buildContent, type StudyItem } from "@/content/content";
+import type { CuratedData } from "@/content/curated";
+import { definitionFor, loadDefinitions, type Definitions } from "@/content/definitions";
+import musclesData from "../data/content/muscles.json";
+import nervesData from "../data/content/nerves.json";
 import { useUrlViewState } from "@/state/useUrlViewState";
 import { DEFAULT_VIEW_STATE, orderSystems, type Selection } from "@/state/view-state";
 import { decodeDeckLink, type Deck } from "@/study/decks";
@@ -13,10 +17,12 @@ import { useStudy } from "@/study/useStudy";
 import { AboutDialog } from "@/ui/AboutDialog";
 import { DetailPanel } from "@/ui/DetailPanel";
 import { Header } from "@/ui/Header";
+import { LesionPanel } from "@/ui/LesionPanel";
 import { ErrorStatus, LoadingStatus } from "@/ui/LoadingStatus";
 import { SearchDialog } from "@/ui/SearchDialog";
 import { SystemsPanel } from "@/ui/SystemsPanel";
 import { ViewDock } from "@/ui/ViewDock";
+import { ExamPanel } from "@/ui/study/ExamPanel";
 import { QuizPanel } from "@/ui/study/QuizPanel";
 import { SessionSummary } from "@/ui/study/SessionSummary";
 import { StudyHome } from "@/ui/study/StudyHome";
@@ -25,11 +31,17 @@ import type {
   CameraPose,
   Insets,
   SceneState,
+  Slice,
   ViewPreset,
 } from "@/viewer/AnatomyViewer";
 import { ViewerCanvas } from "@/viewer/ViewerCanvas";
 
 const EMPTY: readonly string[] = [];
+const CURATED: CuratedData = {
+  muscles: musclesData.muscles as CuratedData["muscles"],
+  nerves: nervesData.nerves as CuratedData["nerves"],
+};
+const LESION_COLOR = "#dc2626";
 
 /** Part IDs for a selection, or an empty list when it does not exist in this atlas. */
 function resolveSelection(index: AtlasIndex | null, selection: Selection | null) {
@@ -53,6 +65,9 @@ export default function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [studying, setStudying] = useState(false);
+  const [lesion, setLesion] = useState<string | null>(null);
+  const [slice, setSlice] = useState<Slice | null>(null);
+  const [definitions, setDefinitions] = useState<Definitions | null>(null);
   const [sharedDeck, setSharedDeck] = useState<Deck | null>(() =>
     decodeDeckLink(window.location.hash),
   );
@@ -68,6 +83,7 @@ export default function App() {
 
   useEffect(() => {
     trackVisit();
+    void loadDefinitions().then(setDefinitions, () => {});
     const abort = new AbortController();
     loadAtlas(ATLAS_URL, abort.signal)
       .then(setIndex)
@@ -77,11 +93,18 @@ export default function App() {
     return () => abort.abort();
   }, []);
 
-  const content = useMemo(() => (index ? buildContent(index) : null), [index]);
-  const study = useStudy(content);
+  const content = useMemo(() => (index ? buildContent(index, CURATED) : null), [index]);
+  const study = useStudy(content, CURATED);
   const { session } = study;
-  const question = studying ? (session?.question ?? null) : null;
+  const { exam } = study;
+  const examQuestion =
+    exam && exam.index < exam.stations.length ? exam.stations[exam.index]! : null;
+  const question = studying ? (session?.question ?? examQuestion) : null;
   const answer = studying ? (session?.answer ?? null) : null;
+
+  useEffect(() => {
+    viewerRef.current?.setSlice(studying ? null : slice);
+  }, [slice, studying]);
 
   // A shared deck link (#study=1&…) saves the deck and opens study mode.
   useEffect(() => {
@@ -137,7 +160,36 @@ export default function App() {
     }),
     [question, view.visible, view.view],
   );
-  const scene = studying ? studyScene : exploreScene;
+  // Lesion view: skeleton and muscles, with the denervated muscles in red.
+  const lesionParts = useMemo(
+    () =>
+      lesion && content
+        ? content.items.filter((i) => i.muscle?.n === lesion).flatMap((i) => i.partIds)
+        : [],
+    [lesion, content],
+  );
+  const lesionScene = useMemo<SceneState>(
+    () => ({
+      visible: ["skeletal", "muscular"],
+      selected: EMPTY,
+      isolate: false,
+      explode: 0,
+      rotate: false,
+      view: view.view,
+    }),
+    [view.view],
+  );
+  const scene = studying ? studyScene : lesion ? lesionScene : exploreScene;
+
+  useEffect(() => {
+    if (studying) return;
+    const viewer = viewerRef.current;
+    if (!viewer) return;
+    if (lesion) {
+      viewer.setHighlights(new Map(lesionParts.map((id) => [id, LESION_COLOR])));
+      viewer.flyTo(lesionParts);
+    } else viewer.setHighlights(null);
+  }, [lesion, lesionParts, studying]);
 
   // Quiz highlights and camera moves.
   useEffect(() => {
@@ -366,8 +418,9 @@ export default function App() {
       siblings: item ? content.siblings(item.conceptId) : [],
       quizItems,
       quizCount: Math.min(quizItems.length, 12),
+      definition: index ? definitionFor(definitions, index, conceptId) : null,
     };
-  }, [content, index, view.selection, selectedParts]);
+  }, [content, index, view.selection, selectedParts, definitions]);
 
   const quizSelection = () => {
     if (!detailInfo || detailInfo.quizItems.length === 0) return;
@@ -416,6 +469,11 @@ export default function App() {
               open={systemsOpen}
               onClose={() => setSystemsOpen(false)}
               onChange={setVisible}
+              onLesions={() => {
+                setSystemsOpen(false);
+                update({ selection: null, isolate: false });
+                setLesion("radial");
+              }}
             />
           )}
 
@@ -429,6 +487,8 @@ export default function App() {
             onRotate={() => setRotate((r) => !r)}
             onReset={reset}
             onSystems={() => setSystemsOpen((o) => !o)}
+            slice={slice}
+            onSlice={setSlice}
           />
 
           <p className="pointer-events-none absolute bottom-6 left-4 z-10 hidden text-xs text-ink-faint xl:block">
@@ -436,7 +496,22 @@ export default function App() {
             structure
           </p>
 
-          {index && view.selection && selectedParts.length > 0 && (
+          {lesion && content && (
+            <LesionPanel
+              ref={detailRef}
+              curated={CURATED}
+              nerveId={lesion}
+              affected={content.items.filter((i) => i.muscle?.n === lesion)}
+              onChange={setLesion}
+              onSelect={(id) => {
+                setLesion(null);
+                selectConcept(id);
+              }}
+              onClose={() => setLesion(null)}
+            />
+          )}
+
+          {!lesion && index && view.selection && selectedParts.length > 0 && (
             <DetailPanel
               key={view.selection.id}
               ref={detailRef}
@@ -451,6 +526,11 @@ export default function App() {
               info={detailInfo}
               onSelectConcept={selectConcept}
               onQuiz={quizSelection}
+              curated={CURATED}
+              onLesion={(nerveId) => {
+                update({ selection: null, isolate: false });
+                setLesion(nerveId);
+              }}
             />
           )}
         </>
@@ -458,7 +538,9 @@ export default function App() {
 
       {studying && index && content && ready && (
         <>
-          {session ? (
+          {exam ? (
+            <ExamPanel ref={studyRef} study={study} />
+          ) : session ? (
             <QuizPanel ref={studyRef} study={study} />
           ) : study.summary ? (
             <SessionSummary
@@ -473,6 +555,8 @@ export default function App() {
               content={content}
               study={study}
               onClose={toggleStudy}
+              curated={CURATED}
+              definitions={definitions}
             />
           )}
         </>

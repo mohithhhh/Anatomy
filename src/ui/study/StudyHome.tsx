@@ -1,8 +1,11 @@
 import { clsx } from "clsx";
-import { Check, Flame, Link2, Plus, Trash2, X } from "lucide-react";
+import { Check, Download, Flame, Link2, Plus, Timer, Trash2, X } from "lucide-react";
 import { forwardRef, useState } from "react";
 import type { AtlasIndex } from "@/atlas/atlas-index";
 import type { ContentIndex } from "@/content/content";
+import type { CuratedData } from "@/content/curated";
+import type { Definitions } from "@/content/definitions";
+import { deckToAnki, downloadText } from "@/study/anki";
 import { STARTER_DECKS, deckItems, encodeDeckLink, makeDeck, type Deck } from "@/study/decks";
 import { cardsFor } from "@/study/questions";
 import type { Study } from "@/study/useStudy";
@@ -15,6 +18,8 @@ interface Props {
   content: ContentIndex;
   study: Study;
   onClose: () => void;
+  curated: CuratedData;
+  definitions: Definitions | null;
 }
 
 function Stat({ label, value, icon }: { label: string; value: number; icon?: React.ReactNode }) {
@@ -30,7 +35,7 @@ function Stat({ label, value, icon }: { label: string; value: number; icon?: Rea
 }
 
 export const StudyHome = forwardRef<HTMLElement, Props>(function StudyHome(
-  { index, content, study, onClose },
+  { index, content, study, onClose, curated, definitions },
   ref,
 ) {
   const [building, setBuilding] = useState(false);
@@ -137,6 +142,24 @@ export const StudyHome = forwardRef<HTMLElement, Props>(function StudyHome(
                             )}
                           </IconButton>
                           <IconButton
+                            label={`Export ${deck.name} for Anki`}
+                            className="size-8"
+                            onClick={() =>
+                              downloadText(
+                                `${deck.name.replace(/[^A-Za-z0-9]+/g, "-")}.anki.txt`,
+                                deckToAnki(
+                                  deck,
+                                  content,
+                                  curated,
+                                  definitions,
+                                  window.location.origin,
+                                ),
+                              )
+                            }
+                          >
+                            <Download size={15} aria-hidden />
+                          </IconButton>
+                          <IconButton
                             label={`Delete ${deck.name}`}
                             className="size-8"
                             onClick={() => {
@@ -152,16 +175,26 @@ export const StudyHome = forwardRef<HTMLElement, Props>(function StudyHome(
                             <Trash2 size={15} aria-hidden />
                           </IconButton>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => start(deck)}
-                          disabled={ready === 0}
-                          className="tap mt-2 h-9 w-full rounded-lg bg-ink text-sm font-medium text-white hover:bg-ink/85 disabled:bg-ink/10 disabled:text-ink-muted"
-                        >
-                          {ready === 0
-                            ? "All done for today"
-                            : `Study ${Math.min(ready, 30)} cards`}
-                        </button>
+                        <div className="mt-2 flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => start(deck)}
+                            disabled={ready === 0}
+                            className="tap h-9 flex-1 rounded-lg bg-ink text-sm font-medium text-white hover:bg-ink/85 disabled:bg-ink/10 disabled:text-ink-muted"
+                          >
+                            {ready === 0
+                              ? "All done for today"
+                              : `Study ${Math.min(ready, 30)} cards`}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void study.startExam(deck)}
+                            className="tap flex h-9 items-center gap-1.5 rounded-lg border border-line px-3 text-sm font-medium text-ink-muted hover:bg-ink/5 hover:text-ink"
+                            title="10 timed stations, typed answers, like a practical exam"
+                          >
+                            <Timer size={15} aria-hidden /> Exam
+                          </button>
+                        </div>
                       </li>
                     );
                   })}

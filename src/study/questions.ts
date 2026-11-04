@@ -1,6 +1,7 @@
 import { SYSTEM_BY_ID } from "../atlas/systems.ts";
 import type { SystemId } from "../atlas/types.ts";
 import type { StudyItem } from "../content/content.ts";
+import { EMPTY_CURATED, nerveName, type CuratedData } from "../content/curated.ts";
 import type { QuestionType } from "./decks.ts";
 import { seededRandom, shuffle } from "./random.ts";
 
@@ -113,6 +114,9 @@ export function cardsFor(items: readonly StudyItem[], types: readonly QuestionTy
     if (want.has("partOf") && item.parentName && parents.size >= 3) {
       cards.push({ id: `partOf:${id}`, type: "partOf", conceptId: id });
     }
+    if (want.has("nerve") && item.muscle) {
+      cards.push({ id: `nerve:${id}`, type: "nerve", conceptId: id });
+    }
     if (want.has("system") && systems.size >= 2) {
       cards.push({ id: `system:${id}`, type: "system", conceptId: id });
     }
@@ -208,6 +212,7 @@ export function buildQuestion(
   pool: readonly StudyItem[],
   deckSystems: readonly SystemId[],
   seed: string | number,
+  curated: CuratedData = EMPTY_CURATED,
 ): Question | null {
   const item = byConcept.get(card.conceptId);
   if (!item) return null;
@@ -290,6 +295,27 @@ export function buildQuestion(
         kind: "choice",
         ...withOptions(item.parentName, distractors, random),
         explanation: `${item.name} is part of the ${item.parentName.charAt(0).toLowerCase()}${item.parentName.slice(1)}.`,
+      };
+    }
+    case "nerve": {
+      if (!item.muscle) return null;
+      const correct = nerveName(curated, item.muscle.n);
+      const upper = item.region === "upper_limb";
+      const sameLimb = ["axillary", "musculocutaneous", "radial", "median", "ulnar"];
+      const others = Object.keys(curated.nerves)
+        .filter((id) => id !== item.muscle!.n && sameLimb.includes(id) === upper)
+        .map((id) => nerveName(curated, id))
+        .filter((n) => n !== correct);
+      const distractors = shuffle(others, random).slice(0, 3);
+      if (distractors.length < 2) return null;
+      return {
+        ...base,
+        prompt: "Which nerve supplies the highlighted muscle?",
+        subjects: [],
+        highlight: tint(item, COLORS.target),
+        kind: "choice",
+        ...withOptions(correct, distractors, random),
+        explanation: `${item.muscleName ?? item.name} is supplied by the ${correct.charAt(0).toLowerCase()}${correct.slice(1)} (${item.muscle.r}). Draft content, pending expert review.`,
       };
     }
     case "spatial": {

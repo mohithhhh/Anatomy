@@ -24,7 +24,11 @@ It has two modes. **Explore** is the 3D atlas. **Study** quizzes you on the mode
 - **Deep links.** The URL always describes the current view (selection, systems, explode, camera), so a copied link reopens it exactly. Example: `/#c=FMA7088&iso=1` opens the heart, isolated.
 - **Phones and desktops.** Bottom sheets on phones and side panels on larger screens. Tested at 390×844, 320×568 and 844×390.
 - **AI agents.** In browsers with WebMCP, agents can search the atlas and open structures for the user.
-- **Info panel.** Region and side, the larger structure a part belongs to, its other parts, and a "Quiz me on this" button.
+- **Info panel.** Region and side, a sourced definition (Uberon, 923 structures), the larger structure a part belongs to, its other parts, and a "Quiz me on this" button.
+- **Muscle cards.** 75 limb muscles with origin, insertion, action and nerve supply. They are drafts until an anatomist reviews them.
+- **Nerve lesions.** Pick one of 11 limb nerves: the muscles it supplies turn red, and the panel lists the expected deficits ("wrist drop").
+- **Cross-sections.** Cut the body axially, sagittally or coronally at any level.
+- **Works offline.** Installable as an app; the model and app files are cached after the first visit.
 
 ### Study
 
@@ -38,6 +42,8 @@ It has two modes. **Explore** is the 3D atlas. **Study** quizzes you on the mode
 - **Spaced repetition.** The FSRS algorithm schedules each card, with up to 20 new cards a day. Missed cards come back later in the same session.
 - **Decks.** Choose body regions, systems and question types, or start from one of five ready-made decks. Share any deck by link.
 - **No account.** Progress, streaks and decks are saved in the browser (IndexedDB).
+- **Practical exam.** Ten tagged structures at 60 seconds each, typed answers and no feedback until the end, then a review of your misses.
+- **Anki export.** Text cards (definitions, part of, muscle facts, directions), each linking back to the 3D view.
 
 ## Run locally
 
@@ -52,17 +58,18 @@ Open http://localhost:3016. The first run downloads and verifies the model data,
 
 ## Scripts
 
-| Command                  | What it does                                                                       |
-| ------------------------ | ---------------------------------------------------------------------------------- |
-| `npm run dev`            | Development server                                                                 |
-| `npm run build`          | Production build in `dist/` (downloads model data first)                           |
-| `npm run preview`        | Serve the production build                                                         |
-| `npm run models`         | Download and checksum-verify the model data                                        |
-| `npm run validate:atlas` | Check every mesh buffer, index, concept mapping and the triangle count             |
-| `npm run report:content` | Write `docs/content/regions-report.md` to spot-check region tags                   |
-| `npm run check`          | Typecheck, lint, format check and unit tests                                       |
-| `npm test`               | Unit tests (Vitest)                                                                |
-| `npm run test:e2e`       | Browser tests (Playwright) against the production build; run `npm run build` first |
+| Command                              | What it does                                                                       |
+| ------------------------------------ | ---------------------------------------------------------------------------------- |
+| `npm run dev`                        | Development server                                                                 |
+| `npm run build`                      | Production build in `dist/` (downloads model data first)                           |
+| `npm run preview`                    | Serve the production build                                                         |
+| `npm run models`                     | Download and checksum-verify the model data                                        |
+| `npm run validate:atlas`             | Check every mesh buffer, index, concept mapping and the triangle count             |
+| `node scripts/build-definitions.mjs` | Rebuild `data/content/definitions.json` from the pinned Uberon release             |
+| `npm run report:content`             | Write `docs/content/regions-report.md` to spot-check region tags                   |
+| `npm run check`                      | Typecheck, lint, format check and unit tests                                       |
+| `npm test`                           | Unit tests (Vitest)                                                                |
+| `npm run test:e2e`                   | Browser tests (Playwright) against the production build; run `npm run build` first |
 
 ## Project layout
 
@@ -96,6 +103,8 @@ To count study sessions and day-7 returns, set `VITE_PLAUSIBLE_DOMAIN` (and opti
 ## Data and licenses
 
 - **Anatomy data:** [BodyParts3D](https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html), © The Database Center for Life Science, CC BY 4.0. We use the browser-ready geometry prepared by [human-atlas](https://github.com/ashemag/human-atlas).
+- **Definitions:** [Uberon](https://obophenotype.github.io/uberon/) release 2026-10-01, CC BY 3.0.
+- **Muscle and nerve cards:** written for this project from standard references (Moore, Gray's). They are drafts pending expert review; please report errors with the in-app link.
 - **Code:** MIT (see `LICENSE`). Parts of the viewer are adapted from human-atlas, MIT (see `src/viewer/LICENSE.human-atlas`).
 
 Full credits are in [`public/ATTRIBUTION.md`](public/ATTRIBUTION.md).

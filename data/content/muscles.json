@@ -1,0 +1,538 @@
+{
+  "$comment": "Hand-curated from standard anatomy references (Moore's Clinically Oriented Anatomy, Gray's Anatomy). Keys are atlas muscle names without side. o = origin, i = insertion, a = action, n = nerve (see nerves.json), r = spinal roots. DRAFT: not yet reviewed by an anatomist.",
+  "status": "draft",
+  "muscles": {
+    "deltoid": {
+      "o": "Lateral third of clavicle, acromion and spine of scapula",
+      "i": "Deltoid tuberosity of humerus",
+      "a": "Abducts the arm (15–90°); anterior part flexes, posterior part extends",
+      "n": "axillary",
+      "r": "C5–C6"
+    },
+    "teres minor": {
+      "o": "Lateral border of scapula",
+      "i": "Greater tubercle of humerus (inferior facet)",
+      "a": "Laterally rotates the arm; rotator cuff",
+      "n": "axillary",
+      "r": "C5–C6"
+    },
+    "supraspinatus": {
+      "o": "Supraspinous fossa of scapula",
+      "i": "Greater tubercle of humerus (superior facet)",
+      "a": "Starts abduction (first 15°); rotator cuff",
+      "n": "suprascapular",
+      "r": "C5–C6"
+    },
+    "infraspinatus muscle": {
+      "o": "Infraspinous fossa of scapula",
+      "i": "Greater tubercle of humerus (middle facet)",
+      "a": "Laterally rotates the arm; rotator cuff",
+      "n": "suprascapular",
+      "r": "C5–C6"
+    },
+    "teres major": {
+      "o": "Inferior angle of scapula",
+      "i": "Medial lip of intertubercular sulcus of humerus",
+      "a": "Adducts and medially rotates the arm",
+      "n": "lower subscapular",
+      "r": "C5–C7"
+    },
+    "pectoralis major": {
+      "o": "Clavicle, sternum, upper six costal cartilages",
+      "i": "Lateral lip of intertubercular sulcus of humerus",
+      "a": "Adducts and medially rotates the arm; clavicular head flexes",
+      "n": "medial and lateral pectoral",
+      "r": "C5–T1"
+    },
+    "pectoralis minor": {
+      "o": "Ribs 3–5",
+      "i": "Coracoid process of scapula",
+      "a": "Stabilises the scapula, draws it forward and down",
+      "n": "medial pectoral",
+      "r": "C8–T1"
+    },
+    "serratus anterior": {
+      "o": "Ribs 1–8",
+      "i": "Medial border of scapula (anterior surface)",
+      "a": "Protracts and upwardly rotates the scapula",
+      "n": "long thoracic",
+      "r": "C5–C7"
+    },
+    "subclavius": {
+      "o": "First rib and costal cartilage",
+      "i": "Inferior surface of clavicle",
+      "a": "Anchors and depresses the clavicle",
+      "n": "nerve to subclavius",
+      "r": "C5–C6"
+    },
+    "levator scapulae": {
+      "o": "Transverse processes of C1–C4",
+      "i": "Medial border of scapula above the spine",
+      "a": "Elevates the scapula",
+      "n": "dorsal scapular",
+      "r": "C3–C5"
+    },
+    "biceps brachii": {
+      "o": "Short head: coracoid process; long head: supraglenoid tubercle",
+      "i": "Radial tuberosity and bicipital aponeurosis",
+      "a": "Supinates the forearm and flexes the elbow",
+      "n": "musculocutaneous",
+      "r": "C5–C6"
+    },
+    "coracobrachialis": {
+      "o": "Coracoid process of scapula",
+      "i": "Middle of medial humeral shaft",
+      "a": "Flexes and adducts the arm",
+      "n": "musculocutaneous",
+      "r": "C5–C7"
+    },
+    "brachialis": {
+      "o": "Distal half of anterior humerus",
+      "i": "Coronoid process and tuberosity of ulna",
+      "a": "Flexes the elbow",
+      "n": "musculocutaneous",
+      "r": "C5–C6"
+    },
+    "triceps brachii": {
+      "o": "Long head: infraglenoid tubercle; lateral and medial heads: posterior humerus",
+      "i": "Olecranon of ulna",
+      "a": "Extends the elbow",
+      "n": "radial",
+      "r": "C6–C8"
+    },
+    "anconeus": {
+      "o": "Lateral epicondyle of humerus",
+      "i": "Olecranon and posterior ulna",
+      "a": "Assists elbow extension",
+      "n": "radial",
+      "r": "C7–C8"
+    },
+    "brachioradialis": {
+      "o": "Lateral supracondylar ridge of humerus",
+      "i": "Styloid process of radius",
+      "a": "Flexes the elbow, especially in mid-pronation",
+      "n": "radial",
+      "r": "C5–C6"
+    },
+    "extensor carpi radialis longus": {
+      "o": "Lateral supracondylar ridge of humerus",
+      "i": "Base of second metacarpal",
+      "a": "Extends and abducts the wrist",
+      "n": "radial",
+      "r": "C6–C7"
+    },
+    "extensor carpi radialis brevis": {
+      "o": "Lateral epicondyle of humerus",
+      "i": "Base of third metacarpal",
+      "a": "Extends and abducts the wrist",
+      "n": "radial",
+      "r": "C7–C8"
+    },
+    "extensor digitorum": {
+      "o": "Lateral epicondyle of humerus",
+      "i": "Extensor expansions of digits 2–5",
+      "a": "Extends the fingers and wrist",
+      "n": "radial",
+      "r": "C7–C8"
+    },
+    "extensor digiti minimi": {
+      "o": "Lateral epicondyle of humerus",
+      "i": "Extensor expansion of little finger",
+      "a": "Extends the little finger",
+      "n": "radial",
+      "r": "C7–C8"
+    },
+    "extensor carpi ulnaris": {
+      "o": "Lateral epicondyle of humerus and posterior ulna",
+      "i": "Base of fifth metacarpal",
+      "a": "Extends and adducts the wrist",
+      "n": "radial",
+      "r": "C7–C8"
+    },
+    "supinator": {
+      "o": "Lateral epicondyle, supinator crest of ulna",
+      "i": "Proximal lateral radius",
+      "a": "Supinates the forearm",
+      "n": "radial",
+      "r": "C6–C7"
+    },
+    "abductor pollicis longus": {
+      "o": "Posterior radius, ulna and interosseous membrane",
+      "i": "Base of first metacarpal",
+      "a": "Abducts and extends the thumb",
+      "n": "radial",
+      "r": "C7–C8"
+    },
+    "extensor pollicis brevis": {
+      "o": "Posterior radius and interosseous membrane",
+      "i": "Base of proximal phalanx of thumb",
+      "a": "Extends the thumb at the metacarpophalangeal joint",
+      "n": "radial",
+      "r": "C7–C8"
+    },
+    "extensor pollicis longus": {
+      "o": "Posterior ulna and interosseous membrane",
+      "i": "Base of distal phalanx of thumb",
+      "a": "Extends all joints of the thumb",
+      "n": "radial",
+      "r": "C7–C8"
+    },
+    "extensor indicis": {
+      "o": "Posterior ulna and interosseous membrane",
+      "i": "Extensor expansion of index finger",
+      "a": "Extends the index finger",
+      "n": "radial",
+      "r": "C7–C8"
+    },
+    "pronator teres": {
+      "o": "Medial epicondyle of humerus and coronoid process of ulna",
+      "i": "Middle of lateral radius",
+      "a": "Pronates the forearm",
+      "n": "median",
+      "r": "C6–C7"
+    },
+    "flexor carpi radialis": {
+      "o": "Medial epicondyle of humerus",
+      "i": "Base of second metacarpal",
+      "a": "Flexes and abducts the wrist",
+      "n": "median",
+      "r": "C6–C7"
+    },
+    "palmaris longus": {
+      "o": "Medial epicondyle of humerus",
+      "i": "Palmar aponeurosis",
+      "a": "Flexes the wrist; absent in some people",
+      "n": "median",
+      "r": "C7–C8"
+    },
+    "flexor digitorum superficialis": {
+      "o": "Medial epicondyle, coronoid process, anterior radius",
+      "i": "Middle phalanges of digits 2–5",
+      "a": "Flexes the proximal interphalangeal joints",
+      "n": "median",
+      "r": "C7–T1"
+    },
+    "flexor pollicis longus": {
+      "o": "Anterior radius and interosseous membrane",
+      "i": "Base of distal phalanx of thumb",
+      "a": "Flexes the thumb",
+      "n": "median",
+      "r": "C7–C8"
+    },
+    "pronator quadratus": {
+      "o": "Distal anterior ulna",
+      "i": "Distal anterior radius",
+      "a": "Pronates the forearm",
+      "n": "median",
+      "r": "C7–C8"
+    },
+    "flexor digitorum profundus": {
+      "o": "Anterior ulna and interosseous membrane",
+      "i": "Distal phalanges of digits 2–5",
+      "a": "Flexes the distal interphalangeal joints",
+      "n": "median",
+      "r": "C8–T1"
+    },
+    "abductor pollicis brevis": {
+      "o": "Flexor retinaculum, scaphoid and trapezium",
+      "i": "Lateral base of proximal phalanx of thumb",
+      "a": "Abducts the thumb",
+      "n": "median",
+      "r": "C8–T1"
+    },
+    "flexor pollicis brevis": {
+      "o": "Flexor retinaculum and trapezium",
+      "i": "Base of proximal phalanx of thumb",
+      "a": "Flexes the thumb",
+      "n": "median",
+      "r": "C8–T1"
+    },
+    "opponens pollicis": {
+      "o": "Flexor retinaculum and trapezium",
+      "i": "Lateral first metacarpal",
+      "a": "Opposes the thumb",
+      "n": "median",
+      "r": "C8–T1"
+    },
+    "lumbricals of hand": {
+      "o": "Tendons of flexor digitorum profundus",
+      "i": "Extensor expansions of digits 2–5",
+      "a": "Flex the knuckles and extend the interphalangeal joints; lateral two by median, medial two by ulnar nerve",
+      "n": "median",
+      "r": "C8–T1"
+    },
+    "flexor carpi ulnaris": {
+      "o": "Medial epicondyle, olecranon and posterior ulna",
+      "i": "Pisiform, hook of hamate, fifth metacarpal",
+      "a": "Flexes and adducts the wrist",
+      "n": "ulnar",
+      "r": "C7–T1"
+    },
+    "adductor pollicis": {
+      "o": "Capitate and second and third metacarpals",
+      "i": "Medial base of proximal phalanx of thumb",
+      "a": "Adducts the thumb",
+      "n": "ulnar",
+      "r": "C8–T1"
+    },
+    "dorsal interossei of hand": {
+      "o": "Adjacent sides of metacarpals",
+      "i": "Extensor expansions and proximal phalanges of digits 2–4",
+      "a": "Abduct the fingers (DAB)",
+      "n": "ulnar",
+      "r": "C8–T1"
+    },
+    "palmar interossei of hand": {
+      "o": "Palmar surfaces of metacarpals 2, 4, 5",
+      "i": "Extensor expansions of digits 2, 4, 5",
+      "a": "Adduct the fingers (PAD)",
+      "n": "ulnar",
+      "r": "C8–T1"
+    },
+    "gluteus maximus": {
+      "o": "Ilium behind the posterior gluteal line, sacrum, coccyx",
+      "i": "Iliotibial tract and gluteal tuberosity of femur",
+      "a": "Extends and laterally rotates the thigh",
+      "n": "inferior_gluteal",
+      "r": "L5–S2"
+    },
+    "gluteus medius": {
+      "o": "External ilium between anterior and posterior gluteal lines",
+      "i": "Greater trochanter of femur",
+      "a": "Abducts and medially rotates the thigh; steadies the pelvis in walking",
+      "n": "superior_gluteal",
+      "r": "L4–S1"
+    },
+    "gluteus minimus": {
+      "o": "External ilium between anterior and inferior gluteal lines",
+      "i": "Greater trochanter of femur",
+      "a": "Abducts and medially rotates the thigh",
+      "n": "superior_gluteal",
+      "r": "L4–S1"
+    },
+    "piriformis": {
+      "o": "Anterior sacrum",
+      "i": "Greater trochanter of femur",
+      "a": "Laterally rotates the extended thigh",
+      "n": "nerve to piriformis",
+      "r": "S1–S2"
+    },
+    "gemellus superior": {
+      "o": "Ischial spine",
+      "i": "Greater trochanter of femur",
+      "a": "Laterally rotates the thigh",
+      "n": "nerve to obturator internus",
+      "r": "L5–S1"
+    },
+    "gemellus inferior": {
+      "o": "Ischial tuberosity",
+      "i": "Greater trochanter of femur",
+      "a": "Laterally rotates the thigh",
+      "n": "nerve to quadratus femoris",
+      "r": "L5–S1"
+    },
+    "quadratus femoris": {
+      "o": "Ischial tuberosity",
+      "i": "Quadrate tubercle of femur",
+      "a": "Laterally rotates the thigh",
+      "n": "nerve to quadratus femoris",
+      "r": "L5–S1"
+    },
+    "sartorius": {
+      "o": "Anterior superior iliac spine",
+      "i": "Upper medial tibia (pes anserinus)",
+      "a": "Flexes, abducts and laterally rotates the hip; flexes the knee",
+      "n": "femoral",
+      "r": "L2–L3"
+    },
+    "rectus femoris": {
+      "o": "Anterior inferior iliac spine",
+      "i": "Tibial tuberosity via the patellar ligament",
+      "a": "Extends the knee and flexes the hip",
+      "n": "femoral",
+      "r": "L2–L4"
+    },
+    "vastus lateralis": {
+      "o": "Greater trochanter and lateral linea aspera",
+      "i": "Tibial tuberosity via the patellar ligament",
+      "a": "Extends the knee",
+      "n": "femoral",
+      "r": "L2–L4"
+    },
+    "vastus medialis": {
+      "o": "Intertrochanteric line and medial linea aspera",
+      "i": "Tibial tuberosity via the patellar ligament",
+      "a": "Extends the knee; stabilises the patella",
+      "n": "femoral",
+      "r": "L2–L4"
+    },
+    "vastus intermedius": {
+      "o": "Anterior and lateral femoral shaft",
+      "i": "Tibial tuberosity via the patellar ligament",
+      "a": "Extends the knee",
+      "n": "femoral",
+      "r": "L2–L4"
+    },
+    "pectineus": {
+      "o": "Superior pubic ramus",
+      "i": "Pectineal line of femur",
+      "a": "Adducts and flexes the thigh",
+      "n": "femoral",
+      "r": "L2–L3"
+    },
+    "adductor longus": {
+      "o": "Body of pubis",
+      "i": "Middle third of linea aspera",
+      "a": "Adducts the thigh",
+      "n": "obturator",
+      "r": "L2–L4"
+    },
+    "adductor brevis": {
+      "o": "Body and inferior ramus of pubis",
+      "i": "Pectineal line and upper linea aspera",
+      "a": "Adducts the thigh",
+      "n": "obturator",
+      "r": "L2–L4"
+    },
+    "adductor magnus": {
+      "o": "Ischiopubic ramus and ischial tuberosity",
+      "i": "Linea aspera and adductor tubercle",
+      "a": "Adducts the thigh; hamstring part extends it (tibial nerve)",
+      "n": "obturator",
+      "r": "L2–L4"
+    },
+    "adductor minimus": {
+      "o": "Inferior pubic ramus",
+      "i": "Upper linea aspera",
+      "a": "Adducts the thigh",
+      "n": "obturator",
+      "r": "L2–L4"
+    },
+    "gracilis": {
+      "o": "Body and inferior ramus of pubis",
+      "i": "Upper medial tibia (pes anserinus)",
+      "a": "Adducts the thigh and flexes the knee",
+      "n": "obturator",
+      "r": "L2–L3"
+    },
+    "biceps femoris": {
+      "o": "Long head: ischial tuberosity; short head: linea aspera",
+      "i": "Head of fibula",
+      "a": "Flexes the knee and extends the hip; short head by the common fibular nerve",
+      "n": "sciatic_tibial",
+      "r": "L5–S2"
+    },
+    "semitendinosus": {
+      "o": "Ischial tuberosity",
+      "i": "Upper medial tibia (pes anserinus)",
+      "a": "Flexes the knee and extends the hip",
+      "n": "sciatic_tibial",
+      "r": "L5–S2"
+    },
+    "semimembranosus": {
+      "o": "Ischial tuberosity",
+      "i": "Posterior medial condyle of tibia",
+      "a": "Flexes the knee and extends the hip",
+      "n": "sciatic_tibial",
+      "r": "L5–S2"
+    },
+    "gastrocnemius": {
+      "o": "Medial and lateral femoral condyles",
+      "i": "Calcaneus via the calcaneal tendon",
+      "a": "Plantarflexes the foot and flexes the knee",
+      "n": "sciatic_tibial",
+      "r": "S1–S2"
+    },
+    "soleus": {
+      "o": "Posterior head of fibula and soleal line of tibia",
+      "i": "Calcaneus via the calcaneal tendon",
+      "a": "Plantarflexes the foot",
+      "n": "sciatic_tibial",
+      "r": "S1–S2"
+    },
+    "plantaris": {
+      "o": "Lateral supracondylar line of femur",
+      "i": "Calcaneus",
+      "a": "Weakly assists plantarflexion and knee flexion",
+      "n": "sciatic_tibial",
+      "r": "S1–S2"
+    },
+    "popliteus": {
+      "o": "Lateral femoral condyle",
+      "i": "Posterior tibia above the soleal line",
+      "a": "Unlocks the extended knee",
+      "n": "sciatic_tibial",
+      "r": "L4–S1"
+    },
+    "flexor digitorum longus": {
+      "o": "Posterior tibia",
+      "i": "Distal phalanges of toes 2–5",
+      "a": "Flexes the lateral four toes",
+      "n": "sciatic_tibial",
+      "r": "S2–S3"
+    },
+    "flexor hallucis longus": {
+      "o": "Posterior fibula",
+      "i": "Distal phalanx of big toe",
+      "a": "Flexes the big toe; push-off in walking",
+      "n": "sciatic_tibial",
+      "r": "S2–S3"
+    },
+    "abductor hallucis": {
+      "o": "Medial process of calcaneal tuberosity",
+      "i": "Proximal phalanx of big toe",
+      "a": "Abducts and flexes the big toe",
+      "n": "sciatic_tibial",
+      "r": "S2–S3"
+    },
+    "flexor digitorum brevis": {
+      "o": "Medial process of calcaneal tuberosity",
+      "i": "Middle phalanges of toes 2–5",
+      "a": "Flexes the lateral four toes",
+      "n": "sciatic_tibial",
+      "r": "S2–S3"
+    },
+    "flexor hallucis brevis": {
+      "o": "Cuboid and lateral cuneiform",
+      "i": "Proximal phalanx of big toe",
+      "a": "Flexes the big toe",
+      "n": "sciatic_tibial",
+      "r": "S2–S3"
+    },
+    "adductor hallucis": {
+      "o": "Metatarsals 2–4 and plantar ligaments",
+      "i": "Proximal phalanx of big toe",
+      "a": "Adducts the big toe",
+      "n": "sciatic_tibial",
+      "r": "S2–S3"
+    },
+    "flexor accessorius": {
+      "o": "Calcaneus",
+      "i": "Tendon of flexor digitorum longus",
+      "a": "Straightens the pull of flexor digitorum longus",
+      "n": "sciatic_tibial",
+      "r": "S2–S3"
+    },
+    "extensor digitorum longus": {
+      "o": "Lateral tibial condyle and anterior fibula",
+      "i": "Middle and distal phalanges of toes 2–5",
+      "a": "Extends the toes and dorsiflexes the foot",
+      "n": "common_fibular",
+      "r": "L5–S1"
+    },
+    "extensor hallucis longus": {
+      "o": "Middle anterior fibula",
+      "i": "Distal phalanx of big toe",
+      "a": "Extends the big toe and dorsiflexes the foot",
+      "n": "common_fibular",
+      "r": "L5–S1"
+    },
+    "extensor hallucis brevis": {
+      "o": "Dorsal calcaneus",
+      "i": "Proximal phalanx of big toe",
+      "a": "Extends the big toe",
+      "n": "common_fibular",
+      "r": "L5–S1"
+    }
+  }
+}

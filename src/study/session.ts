@@ -14,6 +14,7 @@ const TYPE_PRIORITY: Record<CardRef["type"], number> = {
   partOf: 1,
   system: 2,
   spatial: 2,
+  nerve: 2,
 };
 
 export interface DeckStats {
