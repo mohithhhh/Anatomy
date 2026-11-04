@@ -20,6 +20,17 @@ meshes and 3,432 named FMA concepts are kept. We do not modify the geometry furt
 BodyParts3D represents one adult male reference anatomy. It does not include every human structure
 or variation.
 
+## Female body
+
+Kristen Browne and Heidi Schlehlein, Human Reference Atlas / HuBMAP, _3D Reference Organ Set for
+Female v1.5_ (2023), licensed CC BY 4.0. https://doi.org/10.48539/HBM352.BTSQ.586
+
+We use the browser-ready conversion from human-atlas (commit `d72b4f6`): placed on the stage,
+coincident vertices welded, geometry simplified with a 0.2% error bound, normals quantised, and
+colours and display systems curated. All 888 source meshes are kept. It is a reference assembly
+with whole-body surface and selected organs, including female reproductive anatomy; skeleton and
+muscle coverage is partial. Eight placental structures are hidden by default.
+
 ## Code
 
 Parts of the 3D viewer (`src/viewer/`) are adapted from

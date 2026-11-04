@@ -2,7 +2,7 @@
 /**
  * Download the pinned anatomy model data into public/models/<version>/.
  *
- * - Every file is verified against the SHA-256 in data/models.lock.json.
+ * - One lock file per body (data/models*.lock.json); every file is verified against its SHA-256.
  * - Verified files are kept in .cache/models/<version>/ so repeat runs (and CI caches) skip the network.
  * - MODELS_BASE_URL overrides the source, e.g. to use our own mirror.
  *
@@ -26,11 +26,7 @@ if (proxied && !process.env.NODE_USE_ENV_PROXY) {
 }
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const lock = JSON.parse(await readFile(join(root, "data/models.lock.json"), "utf8"));
 const force = process.argv.includes("--force");
-const baseUrl = process.env.MODELS_BASE_URL ?? lock.source.baseUrl;
-const outDir = join(root, "public/models", lock.version);
-const cacheDir = join(root, ".cache/models", lock.version);
 
 const sha256 = (buffer) => createHash("sha256").update(buffer).digest("hex");
 
@@ -56,7 +52,10 @@ async function download(url, attempts = 4) {
   }
 }
 
-async function main() {
+async function fetchBody(lock) {
+  const baseUrl = process.env.MODELS_BASE_URL ?? lock.source.baseUrl;
+  const outDir = join(root, "public/models", lock.version);
+  const cacheDir = join(root, ".cache/models", lock.version);
   await mkdir(outDir, { recursive: true });
   await mkdir(cacheDir, { recursive: true });
   let downloaded = 0;
@@ -89,16 +88,24 @@ async function main() {
     }),
   );
 
-  // Remove model folders from older pinned versions so they never ship.
-  const { readdir } = await import("node:fs/promises");
-  for (const entry of await readdir(join(root, "public/models"))) {
-    if (entry !== lock.version) await rm(join(root, "public/models", entry), { recursive: true });
-  }
-
   const mb = (totalBytes / 1e6).toFixed(1);
   console.log(
     `Model data ${lock.version}: ${lock.files.length} files verified (${mb} MB, ${downloaded} downloaded).`,
   );
+}
+
+async function main() {
+  const { readdir } = await import("node:fs/promises");
+  const names = (await readdir(join(root, "data"))).filter((n) => /^models.*\.lock\.json$/.test(n));
+  const locks = await Promise.all(
+    names.map(async (n) => JSON.parse(await readFile(join(root, "data", n), "utf8"))),
+  );
+  for (const lock of locks) await fetchBody(lock);
+  // Remove model folders from older pinned versions so they never ship.
+  const keep = new Set(locks.map((l) => l.version));
+  for (const entry of await readdir(join(root, "public/models"))) {
+    if (!keep.has(entry)) await rm(join(root, "public/models", entry), { recursive: true });
+  }
 }
 
 main().catch((error) => {
