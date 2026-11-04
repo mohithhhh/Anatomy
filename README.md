@@ -16,6 +16,10 @@ It has two modes. **Explore** is the 3D atlas. **Study** quizzes you on the mode
 
 ### Explore
 
+- **Two bodies.** Switch between male and female at the top left; the choice is part of the link (`#b=f`).
+  - Male: BodyParts3D, 2,234 meshes, full skeleton and muscles.
+  - Female: HuBMAP Human Reference Atlas organ set, 888 meshes, organs and reproductive anatomy, with partial skeleton and muscle coverage.
+
 - **Full-body 3D model.** BodyParts3D adult male reference: 2,234 meshes, 3,432 named FMA concepts and 2.3 million triangles, drawn in one call per system.
 - **Systems.** Show or hide any of 15 systems, or use the presets (skeleton, muscles, organs, vessels).
 - **Explode.** Pull the body apart, then lay every visible piece out flat as an inventory.
@@ -54,7 +58,7 @@ npm ci
 npm run dev
 ```
 
-Open http://localhost:3016. The first run downloads and verifies the model data, about 34 MB; later runs use the cache in `.cache/models`.
+Open http://localhost:3016. The first run downloads and verifies the model data for both bodies, about 58 MB; later runs use the cache in `.cache/models`.
 
 ## Scripts
 
@@ -103,6 +107,7 @@ To count study sessions and day-7 returns, set `VITE_PLAUSIBLE_DOMAIN` (and opti
 ## Data and licenses
 
 - **Anatomy data:** [BodyParts3D](https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html), © The Database Center for Life Science, CC BY 4.0. We use the browser-ready geometry prepared by [human-atlas](https://github.com/ashemag/human-atlas).
+- **Female body:** Kristen Browne and Heidi Schlehlein, Human Reference Atlas / HuBMAP, [3D Reference Organ Set for Female v1.5](https://doi.org/10.48539/HBM352.BTSQ.586) (2023), CC BY 4.0, in the browser conversion by human-atlas. Pinned in `data/models-female.lock.json`.
 - **Definitions:** [Uberon](https://obophenotype.github.io/uberon/) release 2026-10-01, CC BY 3.0.
 - **Muscle and nerve cards:** written for this project from standard references (Moore, Gray's). They are drafts pending expert review; please report errors with the in-app link.
 - **Code:** MIT (see `LICENSE`). Parts of the viewer are adapted from human-atlas, MIT (see `src/viewer/LICENSE.human-atlas`).
