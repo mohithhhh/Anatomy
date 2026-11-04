@@ -1,0 +1,107 @@
+#!/usr/bin/env node
+/**
+ * Download the pinned anatomy model data into public/models/<version>/.
+ *
+ * - Every file is verified against the SHA-256 in data/models.lock.json.
+ * - Verified files are kept in .cache/models/<version>/ so repeat runs (and CI caches) skip the network.
+ * - MODELS_BASE_URL overrides the source, e.g. to use our own mirror.
+ *
+ * Usage: node scripts/fetch-models.mjs [--force]
+ */
+import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
+import { copyFile, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+// Node's fetch only honours HTTPS_PROXY when NODE_USE_ENV_PROXY is set. Re-run once with it.
+const proxied = process.env.HTTPS_PROXY || process.env.https_proxy;
+if (proxied && !process.env.NODE_USE_ENV_PROXY) {
+  const child = spawnSync(process.execPath, ["--no-warnings", ...process.argv.slice(1)], {
+    stdio: "inherit",
+    env: { ...process.env, NODE_USE_ENV_PROXY: "1" },
+  });
+  process.exit(child.status ?? 1);
+}
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const lock = JSON.parse(await readFile(join(root, "data/models.lock.json"), "utf8"));
+const force = process.argv.includes("--force");
+const baseUrl = process.env.MODELS_BASE_URL ?? lock.source.baseUrl;
+const outDir = join(root, "public/models", lock.version);
+const cacheDir = join(root, ".cache/models", lock.version);
+
+const sha256 = (buffer) => createHash("sha256").update(buffer).digest("hex");
+
+async function verified(path, file) {
+  if (!existsSync(path)) return false;
+  const buffer = await readFile(path);
+  return buffer.length === file.bytes && sha256(buffer) === file.sha256;
+}
+
+async function download(url, attempts = 4) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return Buffer.from(await response.arrayBuffer());
+    } catch (error) {
+      if (attempt >= attempts)
+        throw new Error(`Could not download ${url}: ${error.message}`, { cause: error });
+      const wait = 2 ** attempt * 1000;
+      console.warn(`  retrying ${url.split("/").pop()} in ${wait / 1000}s (${error.message})`);
+      await new Promise((resolve) => setTimeout(resolve, wait));
+    }
+  }
+}
+
+async function main() {
+  await mkdir(outDir, { recursive: true });
+  await mkdir(cacheDir, { recursive: true });
+  let downloaded = 0;
+  let totalBytes = 0;
+
+  // Download a few files at a time; there are 16 in total.
+  const queue = [...lock.files];
+  await Promise.all(
+    Array.from({ length: 4 }, async () => {
+      for (let file = queue.shift(); file; file = queue.shift()) {
+        const target = join(outDir, file.name);
+        const cached = join(cacheDir, file.name);
+        totalBytes += file.bytes;
+        if (!force && (await verified(target, file))) continue;
+        if (!force && (await verified(cached, file))) {
+          await copyFile(cached, target);
+          continue;
+        }
+        const buffer = await download(new URL(file.name, baseUrl).href);
+        if (buffer.length !== file.bytes || sha256(buffer) !== file.sha256) {
+          throw new Error(
+            `Checksum mismatch for ${file.name}. Refusing to use unverified model data.`,
+          );
+        }
+        await writeFile(`${cached}.tmp`, buffer);
+        await rename(`${cached}.tmp`, cached);
+        await copyFile(cached, target);
+        downloaded++;
+      }
+    }),
+  );
+
+  // Remove model folders from older pinned versions so they never ship.
+  const { readdir } = await import("node:fs/promises");
+  for (const entry of await readdir(join(root, "public/models"))) {
+    if (entry !== lock.version) await rm(join(root, "public/models", entry), { recursive: true });
+  }
+
+  const mb = (totalBytes / 1e6).toFixed(1);
+  console.log(
+    `Model data ${lock.version}: ${lock.files.length} files verified (${mb} MB, ${downloaded} downloaded).`,
+  );
+}
+
+main().catch((error) => {
+  console.error(error.message);
+  process.exit(1);
+});
