@@ -1,6 +1,6 @@
 # Anatomy: Product Plan and Brainstorm
 
-*Draft, Nov 4, 2026. Builds on "Human Atlas: Gaps and Build Opportunities".*
+_Draft, Nov 4, 2026. Builds on "Human Atlas: Gaps and Build Opportunities"._
 
 ## The one-line bet
 
@@ -14,19 +14,19 @@ Our edge is content and teaching method, not the 3D model. We start a fresh code
 
 These facts come from reading the repository and `public/models/atlas.json` directly. They change some of the effort estimates in the gaps PDF.
 
-| Finding | Why it matters |
-|---|---|
-| **All 2,234 meshes carry an FMA concept ID** (`conceptId: "FMA59763"`). | The info panel is a data-join problem, not a research problem. FMA IDs link to FMA definitions and synonyms, Wikidata (P1402), Uberon and MeSH. |
-| **3,432 concepts, 1,925 of which group several meshes** (e.g. "vascular tree"). | We already have a part-of hierarchy, so we get "zoom out" quiz questions ("which larger structure is this part of?") and region grouping for free. |
-| **1,229 parts are named Left/Right.** | A laterality quiz mode costs almost nothing to build. |
-| **Each part has bounding boxes in metres, Y-up.** | We can generate thousands of spatial questions automatically ("Is the ulna medial or lateral to the radius?"). See idea A1. |
-| **Descriptions are 15 hard-coded paragraphs, one per system** (`app/anatomy.ts`). | Confirms the PDF: no structure has its own text. |
-| **No URL state.** The only `location` use is a reload button. | Deep links and shareable views are greenfield. |
-| **System coverage is lopsided:** arterial 639, venous 404, muscular 402, skeletal 296, nervous 139 … lymphatic 3, endocrine 4, urinary 6, reproductive 12. | Quizzes should start where the data is dense: musculoskeletal, vascular and nervous. We shouldn't promise deep endocrine or lymphatic coverage. |
-| **A female reference set was shipped before and later removed**: HuBMAP *3D Reference Organ Set for Female v1.5*, CC BY 4.0 (see `public/ATTRIBUTION.md`, "Historical assets"). | **This corrects the PDF**, which found only paid female assets. A free, open female body exists. Its skeleton and muscle coverage is partial, but organs and reproductive anatomy are there. That moves "female body" from *hard* to *medium*. |
-| **BodyParts3D 4.0 is officially CC BY 4.0.** The attribution file says the current database license supersedes the old CC BY-SA 2.1 Japan text in the OBJ comments. | That settles the geometry license. **Wikipedia text (CC BY-SA) is still the share-alike risk**, so we avoid it as a primary source. |
-| **WebMCP tools already exist** (`find_anatomy`, `inspect_anatomical_structure`). | AI agents can already drive the viewer. We can extend these tools instead of building a chatbot from scratch (idea D2). |
-| **The code is dense:** about 80 KB of source, with lines thousands of characters long (`page.tsx` is 14.5 KB in 52 lines). The build pulls in `vinext`, `@openai/sites-vite-plugin` and Cloudflare plugins. The repo is **155 MB** because the models are committed as both `.bin` and `.bin.gz`. | This is why we start fresh rather than fork: we port the renderer into a clean module and keep the models out of git (Phase 1). |
+| Finding                                                                                                                                                                                                                                                                                           | Why it matters                                                                                                                                                                                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **All 2,234 meshes carry an FMA concept ID** (`conceptId: "FMA59763"`).                                                                                                                                                                                                                           | The info panel is a data-join problem, not a research problem. FMA IDs link to FMA definitions and synonyms, Wikidata (P1402), Uberon and MeSH.                                                                                                |
+| **3,432 concepts, 1,925 of which group several meshes** (e.g. "vascular tree").                                                                                                                                                                                                                   | We already have a part-of hierarchy, so we get "zoom out" quiz questions ("which larger structure is this part of?") and region grouping for free.                                                                                             |
+| **1,229 parts are named Left/Right.**                                                                                                                                                                                                                                                             | A laterality quiz mode costs almost nothing to build.                                                                                                                                                                                          |
+| **Each part has bounding boxes in metres, Y-up.**                                                                                                                                                                                                                                                 | We can generate thousands of spatial questions automatically ("Is the ulna medial or lateral to the radius?"). See idea A1.                                                                                                                    |
+| **Descriptions are 15 hard-coded paragraphs, one per system** (`app/anatomy.ts`).                                                                                                                                                                                                                 | Confirms the PDF: no structure has its own text.                                                                                                                                                                                               |
+| **No URL state.** The only `location` use is a reload button.                                                                                                                                                                                                                                     | Deep links and shareable views are greenfield.                                                                                                                                                                                                 |
+| **System coverage is lopsided:** arterial 639, venous 404, muscular 402, skeletal 296, nervous 139 … lymphatic 3, endocrine 4, urinary 6, reproductive 12.                                                                                                                                        | Quizzes should start where the data is dense: musculoskeletal, vascular and nervous. We shouldn't promise deep endocrine or lymphatic coverage.                                                                                                |
+| **A female reference set was shipped before and later removed**: HuBMAP _3D Reference Organ Set for Female v1.5_, CC BY 4.0 (see `public/ATTRIBUTION.md`, "Historical assets").                                                                                                                   | **This corrects the PDF**, which found only paid female assets. A free, open female body exists. Its skeleton and muscle coverage is partial, but organs and reproductive anatomy are there. That moves "female body" from _hard_ to _medium_. |
+| **BodyParts3D 4.0 is officially CC BY 4.0.** The attribution file says the current database license supersedes the old CC BY-SA 2.1 Japan text in the OBJ comments.                                                                                                                               | That settles the geometry license. **Wikipedia text (CC BY-SA) is still the share-alike risk**, so we avoid it as a primary source.                                                                                                            |
+| **WebMCP tools already exist** (`find_anatomy`, `inspect_anatomical_structure`).                                                                                                                                                                                                                  | AI agents can already drive the viewer. We can extend these tools instead of building a chatbot from scratch (idea D2).                                                                                                                        |
+| **The code is dense:** about 80 KB of source, with lines thousands of characters long (`page.tsx` is 14.5 KB in 52 lines). The build pulls in `vinext`, `@openai/sites-vite-plugin` and Cloudflare plugins. The repo is **155 MB** because the models are committed as both `.bin` and `.bin.gz`. | This is why we start fresh rather than fork: we port the renderer into a clean module and keep the models out of git (Phase 1).                                                                                                                |
 
 ---
 
@@ -57,6 +57,7 @@ The PDF's eight gaps are included. New ideas are marked **NEW**.
   - "Which of these four is part of the brachial plexus?"
 
   This is our cheapest moat: competitors write their question banks by hand. Directional terms (anterior, posterior, superior, medial and so on) are exactly what first-year students get wrong.
+
 - **A2. Core quiz modes:** find-it (we name it, you click it), name-it (we highlight it, you type or choose the name), labels hidden, laterality (left or right), which system, and part-of.
 - **A3. Spaced repetition with FSRS** (the modern successor to the SM-2 algorithm that Anki uses). Each card is one FMA concept plus one question type. Progress stays on the device with no login (IndexedDB). Sync is opt-in later.
 - **A4. Practical-exam simulator ("steeplechase" or "bell-ringer" stations). NEW.** A pin marks a structure, a 60-second timer runs, you type the name and the next station loads. At the end you get a score and a "review your misses" deck. This mirrors the real exam format, and I found no free competitor that offers it.
@@ -90,13 +91,14 @@ The PDF's eight gaps are included. New ideas are marked **NEW**.
 - **E1. Load by system and work offline.** Load the skeleton first, stream the other systems as needed, and install as a progressive web app (PWA) for offline use. Today's single ~33 MB download hurts students on mobile data.
 - **E2. Multilingual labels (PDF #6):** FMA and TA2 multilingual labels plus Wikidata labels. Start with Spanish, Portuguese and Hindi, where large student populations meet weak free options.
 - **E3. Accessibility:** keyboard navigation through the structure tree, screen-reader labels and a high-contrast mode. Few competitors offer this, and some universities require it.
-- **E4. Female reference body:** reintroduce the HuBMAP CC BY 4.0 set (see section 1) as a second body, labelled honestly as *organ reference, partial musculoskeletal*.
+- **E4. Female reference body:** reintroduce the HuBMAP CC BY 4.0 set (see section 1) as a second body, labelled honestly as _organ reference, partial musculoskeletal_.
 
 ---
 
 ## 4. How we build it: five phases
 
 **Build approach (decided):** a fresh codebase, not a fork.
+
 - Reuse upstream's processed model data (geometry chunks and `atlas.json`, CC BY 4.0, with attribution).
 - Port upstream's renderer (MIT, keeping the copyright notice) and its validation scripts.
 - Write everything else new.
@@ -106,6 +108,7 @@ The PDF's eight gaps are included. New ideas are marked **NEW**.
 **Durations** assume 1 to 2 developers, about 5 months to the end of Phase 4.
 
 ### Phase 1: Foundation (about 2 weeks)
+
 **Goal:** our own app shows the full body and works as well as Human Atlas does today.
 
 1. **Scaffold the repo.** Vite, React, TypeScript, Tailwind and shadcn, with lint, format and type checks in CI. Start with a clean git history.
@@ -120,6 +123,7 @@ The PDF's eight gaps are included. New ideas are marked **NEW**.
 **Exit criteria:** feature parity with Human Atlas on desktop and a mid-range Android phone, every check passing in CI, and a deep link that reopens the exact same view.
 
 ### Phase 2: Study MVP (about 4 weeks) → public launch
+
 **Goal:** a student can study a region for two weeks and measurably remember more.
 
 1. **Content pipeline v0** (`scripts/build-content`). From `atlas.json` alone, produce one record per concept, keyed by FMA ID, with name, system, part-of parents and children, laterality, and centre and bounds.
@@ -139,6 +143,7 @@ The PDF's eight gaps are included. New ideas are marked **NEW**.
 **Exit criteria:** launch to 2 or 3 student cohorts (one real course is enough). Target 25% or more of users returning on day 7, and recall accuracy on due cards rising over two weeks.
 
 ### Phase 3: Content depth (about 4 weeks)
+
 **Goal:** clicking any commonly studied structure tells you what it is and what it does, with sources.
 
 1. **Content pipeline v1.** Join FMA (definitions, synonyms) and Uberon and Wikidata cross-references (labels in other languages, Latin terms) on FMA ID. Every field records its source and license.
@@ -151,6 +156,7 @@ The PDF's eight gaps are included. New ideas are marked **NEW**.
 **Exit criteria:** all limb muscles fully carded and reviewed, and the top 500 concepts defined.
 
 ### Phase 4: Exam-ready and clinical (about 5 weeks)
+
 **Goal:** the best free tool for anatomy practical exams. This is the headline for the next marketing push.
 
 1. **Practical-exam simulator.** Pinned stations, a 60-second timer per station, typed answers, a final score, and an auto-built "your misses" deck. Teachers can share a station set by link.
@@ -163,6 +169,7 @@ The PDF's eight gaps are included. New ideas are marked **NEW**.
 **Exit criteria:** the exam simulator is used by at least one cohort before a real practical exam, and first load on a low-end phone is under 5 seconds for the skeleton.
 
 ### Phase 5: AI, teaching and reach (about 6 weeks, then ongoing)
+
 **Goal:** spread through teachers and languages, and add AI help we trust.
 
 1. **Grounded AI tutor.**
@@ -183,6 +190,7 @@ The PDF's eight gaps are included. New ideas are marked **NEW**.
 **Exit criteria:** at least 10 teachers using tours or the live quiz, one non-English locale shipped, and the tutor passing our accuracy benchmark.
 
 ### Runs through every phase
+
 - **Medical accuracy:** every claim has a source, a reviewer approves each region, and the disclaimer is always visible.
 - **Testing:** the ported validation scripts plus Playwright quiz flows run in CI. Every feature ships with a check.
 - **Feedback loop:** talk to students every 2 weeks, and treat the day-7 return rate as the main metric.
@@ -224,13 +232,13 @@ content pipeline (build-time, scripts/)              static site (Vite + React +
 
 ## 7. Risks (adds to the PDF's list)
 
-| Risk | Mitigation |
-|---|---|
-| Share-alike text contaminates our content license | Keep Wikipedia text out of the core content and show the source on every field. |
-| Medical errors in curated data (muscle attachments, nerve supply) | Cite a source for every claim, provide a "report an error" button and have a clinician or anatomy-teacher reviewer approve each region before release. |
-| Upstream adds quizzes | Unlikely to match generated spatial questions, the exam simulator, lesion mode and the content pipeline. Keep in touch with the upstream author; contributing renderer fixes back builds goodwill. |
-| Mobile performance with quiz UI on top of a ~33 MB model | Load by system (E1) and test on real low-end Android phones, which upstream says it never did. |
-| Model uses older terminology | Map labels to Terminologia Anatomica 2 where possible and show synonyms. |
+| Risk                                                              | Mitigation                                                                                                                                                                                         |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Share-alike text contaminates our content license                 | Keep Wikipedia text out of the core content and show the source on every field.                                                                                                                    |
+| Medical errors in curated data (muscle attachments, nerve supply) | Cite a source for every claim, provide a "report an error" button and have a clinician or anatomy-teacher reviewer approve each region before release.                                             |
+| Upstream adds quizzes                                             | Unlikely to match generated spatial questions, the exam simulator, lesion mode and the content pipeline. Keep in touch with the upstream author; contributing renderer fixes back builds goodwill. |
+| Mobile performance with quiz UI on top of a ~33 MB model          | Load by system (E1) and test on real low-end Android phones, which upstream says it never did.                                                                                                     |
+| Model uses older terminology                                      | Map labels to Terminologia Anatomica 2 where possible and show synonyms.                                                                                                                           |
 
 ---
 
