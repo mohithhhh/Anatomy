@@ -1,6 +1,6 @@
-import { Layers3, Pause, RotateCcw, RotateCw } from "lucide-react";
+import { Layers3, Pause, RotateCcw, RotateCw, Scissors } from "lucide-react";
 import { forwardRef, type CSSProperties } from "react";
-import type { ViewPreset } from "@/viewer/AnatomyViewer";
+import type { Slice, SliceAxis, ViewPreset } from "@/viewer/AnatomyViewer";
 import { IconButton } from "./IconButton";
 
 interface Props {
@@ -12,7 +12,15 @@ interface Props {
   onRotate: () => void;
   onReset: () => void;
   onSystems: () => void;
+  slice: Slice | null;
+  onSlice: (slice: Slice | null) => void;
 }
+
+const AXES: { id: SliceAxis; label: string }[] = [
+  { id: "axial", label: "Axial" },
+  { id: "sagittal", label: "Sagittal" },
+  { id: "coronal", label: "Coronal" },
+];
 
 const VIEWS: { id: ViewPreset; short: string; label: string }[] = [
   { id: "three-quarter", short: "¾", label: "Three-quarter view" },
@@ -22,15 +30,49 @@ const VIEWS: { id: ViewPreset; short: string; label: string }[] = [
 ];
 
 export const ViewDock = forwardRef<HTMLDivElement, Props>(function ViewDock(
-  { explode, view, rotate, onExplode, onView, onRotate, onReset, onSystems },
+  { explode, view, rotate, onExplode, onView, onRotate, onReset, onSystems, slice, onSlice },
   ref,
 ) {
   const percent = Math.round(explode * 100);
   return (
     <div
       ref={ref}
-      className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center p-2 md:p-4"
+      className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-2 p-2 md:p-4"
     >
+      {slice && (
+        <div
+          className="pointer-events-auto panel flex w-full max-w-xl flex-wrap items-center gap-2 p-1.5 md:p-2"
+          role="group"
+          aria-label="Cross-section"
+        >
+          <div className="flex gap-1">
+            {AXES.map((a) => (
+              <button
+                key={a.id}
+                type="button"
+                aria-pressed={slice.axis === a.id}
+                onClick={() => onSlice({ ...slice, axis: a.id })}
+                className={`tap rounded-lg px-2.5 py-1.5 text-xs font-medium ${slice.axis === a.id ? "bg-accent-soft text-accent" : "text-ink-muted hover:bg-ink/5"}`}
+              >
+                {a.label}
+              </button>
+            ))}
+          </div>
+          <label htmlFor="slice-position" className="sr-only">
+            Cut position
+          </label>
+          <input
+            id="slice-position"
+            type="range"
+            min={0}
+            max={100}
+            value={Math.round(slice.position * 100)}
+            onChange={(e) => onSlice({ ...slice, position: Number(e.target.value) / 100 })}
+            className="range min-w-32 flex-1"
+            style={{ "--fill": `${Math.round(slice.position * 100)}%` } as CSSProperties}
+          />
+        </div>
+      )}
       <div className="pointer-events-auto panel flex w-full max-w-xl flex-wrap items-center gap-x-2 gap-y-1 p-1.5 md:flex-nowrap md:gap-3 md:p-2">
         <IconButton label="Systems" onClick={onSystems} className="md:hidden">
           <Layers3 size={19} aria-hidden />
@@ -82,6 +124,15 @@ export const ViewDock = forwardRef<HTMLDivElement, Props>(function ViewDock(
             onClick={onRotate}
           >
             {rotate ? <Pause size={17} aria-hidden /> : <RotateCw size={17} aria-hidden />}
+          </IconButton>
+          <IconButton
+            label={slice ? "Remove cross-section" : "Cross-section"}
+            active={!!slice}
+            aria-pressed={!!slice}
+            disabled={explode > 0.05}
+            onClick={() => onSlice(slice ? null : { axis: "axial", position: 0.75 })}
+          >
+            <Scissors size={17} aria-hidden />
           </IconButton>
           <IconButton label="Reset view" onClick={onReset}>
             <RotateCcw size={17} aria-hidden />

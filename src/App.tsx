@@ -22,6 +22,7 @@ import { ErrorStatus, LoadingStatus } from "@/ui/LoadingStatus";
 import { SearchDialog } from "@/ui/SearchDialog";
 import { SystemsPanel } from "@/ui/SystemsPanel";
 import { ViewDock } from "@/ui/ViewDock";
+import { ExamPanel } from "@/ui/study/ExamPanel";
 import { QuizPanel } from "@/ui/study/QuizPanel";
 import { SessionSummary } from "@/ui/study/SessionSummary";
 import { StudyHome } from "@/ui/study/StudyHome";
@@ -30,6 +31,7 @@ import type {
   CameraPose,
   Insets,
   SceneState,
+  Slice,
   ViewPreset,
 } from "@/viewer/AnatomyViewer";
 import { ViewerCanvas } from "@/viewer/ViewerCanvas";
@@ -64,6 +66,7 @@ export default function App() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [studying, setStudying] = useState(false);
   const [lesion, setLesion] = useState<string | null>(null);
+  const [slice, setSlice] = useState<Slice | null>(null);
   const [definitions, setDefinitions] = useState<Definitions | null>(null);
   const [sharedDeck, setSharedDeck] = useState<Deck | null>(() =>
     decodeDeckLink(window.location.hash),
@@ -93,8 +96,15 @@ export default function App() {
   const content = useMemo(() => (index ? buildContent(index, CURATED) : null), [index]);
   const study = useStudy(content, CURATED);
   const { session } = study;
-  const question = studying ? (session?.question ?? null) : null;
+  const { exam } = study;
+  const examQuestion =
+    exam && exam.index < exam.stations.length ? exam.stations[exam.index]! : null;
+  const question = studying ? (session?.question ?? examQuestion) : null;
   const answer = studying ? (session?.answer ?? null) : null;
+
+  useEffect(() => {
+    viewerRef.current?.setSlice(studying ? null : slice);
+  }, [slice, studying]);
 
   // A shared deck link (#study=1&…) saves the deck and opens study mode.
   useEffect(() => {
@@ -477,6 +487,8 @@ export default function App() {
             onRotate={() => setRotate((r) => !r)}
             onReset={reset}
             onSystems={() => setSystemsOpen((o) => !o)}
+            slice={slice}
+            onSlice={setSlice}
           />
 
           <p className="pointer-events-none absolute bottom-6 left-4 z-10 hidden text-xs text-ink-faint xl:block">
@@ -526,7 +538,9 @@ export default function App() {
 
       {studying && index && content && ready && (
         <>
-          {session ? (
+          {exam ? (
+            <ExamPanel ref={studyRef} study={study} />
+          ) : session ? (
             <QuizPanel ref={studyRef} study={study} />
           ) : study.summary ? (
             <SessionSummary
@@ -541,6 +555,8 @@ export default function App() {
               content={content}
               study={study}
               onClose={toggleStudy}
+              curated={CURATED}
+              definitions={definitions}
             />
           )}
         </>
