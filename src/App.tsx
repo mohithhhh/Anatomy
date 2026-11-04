@@ -6,6 +6,7 @@ import { useUrlViewState } from "@/state/useUrlViewState";
 import { DEFAULT_VIEW_STATE, orderSystems, type Selection } from "@/state/view-state";
 import { ErrorStatus, LoadingStatus } from "@/ui/LoadingStatus";
 import { Header } from "@/ui/Header";
+import { DetailPanel } from "@/ui/DetailPanel";
 import { SearchDialog } from "@/ui/SearchDialog";
 import { SystemsPanel } from "@/ui/SystemsPanel";
 import { ViewDock } from "@/ui/ViewDock";
@@ -34,7 +35,7 @@ function sameInsets(a: Insets, b: Insets) {
 
 export default function App() {
   const desktop = useIsDesktop();
-  const { state: view, update } = useUrlViewState();
+  const { state: view, update, shareUrl } = useUrlViewState();
   const [index, setIndex] = useState<AtlasIndex | null>(null);
   const [error, setError] = useState("");
   const [progress, setProgress] = useState(0);
@@ -49,6 +50,7 @@ export default function App() {
   const headerRef = useRef<HTMLElement>(null);
   const systemsRef = useRef<HTMLElement>(null);
   const dockRef = useRef<HTMLDivElement>(null);
+  const detailRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const abort = new AbortController();
@@ -100,11 +102,15 @@ export default function App() {
       const header = headerRef.current?.getBoundingClientRect();
       const dock = dockRef.current?.getBoundingClientRect();
       const systems = systemsRef.current?.getBoundingClientRect();
+      const detail = detailRef.current?.getBoundingClientRect();
+      const w = window.innerWidth;
+      let bottom = h - (dock?.top ?? h - 110) + gap;
+      if (!desktop && detail?.height) bottom = Math.max(bottom, h - detail.top + gap);
       const next: Insets = {
         top: Math.round((header?.bottom ?? 84) + gap),
-        bottom: Math.round(h - (dock?.top ?? h - 110) + gap),
+        bottom: Math.round(bottom),
         left: desktop && systems?.width ? Math.round(systems.right + gap) : 16,
-        right: 16,
+        right: desktop && detail?.width ? Math.round(w - detail.left + gap) : 16,
       };
       setInsets((prev) => (sameInsets(prev, next) ? prev : next));
     };
@@ -121,19 +127,22 @@ export default function App() {
     [update],
   );
 
-  // "/" opens search from anywhere except text fields.
+  // "/" opens search; Escape clears the selection. Ignored while typing.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const typing =
         e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement;
-      if (e.key === "/" && !typing && !e.metaKey && !e.ctrlKey) {
+      if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === "/") {
         e.preventDefault();
         setSearchOpen(true);
+      } else if (e.key === "Escape") {
+        update((s) => (s.selection ? { ...s, selection: null, isolate: false } : s));
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [update]);
 
   const chooseConcept = (concept: Concept) => {
     setSearchOpen(false);
@@ -154,6 +163,20 @@ export default function App() {
     },
     [update],
   );
+
+  const setIsolate = (isolate: boolean) => {
+    setRotate(false);
+    update((s) => ({ ...s, isolate, explode: 0, camera: null }));
+  };
+
+  const copyLink = async () => {
+    const url = shareUrl(view);
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      window.prompt("Copy this link", url);
+    }
+  };
 
   const setVisible = (visible: SystemId[]) =>
     update({ visible: orderSystems(visible), selection: null, isolate: false });
@@ -228,6 +251,20 @@ export default function App() {
       <p className="pointer-events-none absolute bottom-6 left-4 z-10 hidden text-xs text-ink-faint xl:block">
         {view.explode > 0.8 ? "Drag to pan" : "Drag to orbit"} · Scroll to zoom · Click a structure
       </p>
+
+      {index && view.selection && selectedParts.length > 0 && (
+        <DetailPanel
+          ref={detailRef}
+          index={index}
+          selection={view.selection}
+          partIds={selectedParts}
+          isolated={scene.isolate}
+          onIsolate={setIsolate}
+          onSelectPart={(id) => update({ selection: { kind: "part", id }, isolate: false })}
+          onClose={() => update({ selection: null, isolate: false })}
+          onCopyLink={copyLink}
+        />
+      )}
 
       {searchOpen && index && (
         <SearchDialog index={index} onChoose={chooseConcept} onClose={() => setSearchOpen(false)} />

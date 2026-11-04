@@ -518,7 +518,7 @@ export class AnatomyViewer {
             "#include <color_fragment>",
             [
               "#include <color_fragment>",
-              `diffuseColor.rgb = mix(diffuseColor.rgb, ${SELECTION_COLOR}, vPartSelected * 0.75);`,
+              `diffuseColor.rgb = mix(diffuseColor.rgb, ${SELECTION_COLOR}, vPartSelected * 0.65);`,
               "diffuseColor.rgb = mix(diffuseColor.rgb, vHighlight.rgb, vHighlight.a);",
             ].join("\n"),
           );
@@ -837,7 +837,8 @@ export class AnatomyViewer {
       const selected = selection.has(p.id);
       const shown = isShown(p.id, p.system);
       this.partData.set([dx, dy, dz, shown ? 1 : 0], i * 4);
-      this.selectionData[i * 4] = selected ? 255 : 0;
+      // Isolated structures keep their natural colours; the tint only helps find them in context.
+      this.selectionData[i * 4] = selected && !s.isolate ? 255 : 0;
       this.markerPositions.set(shown ? [c.x + dx, c.y + dy, c.z + dz] : [1e4, 1e4, 1e4], i * 3);
       const picker = this.pickers[i];
       if (picker) {
