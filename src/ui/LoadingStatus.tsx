@@ -4,6 +4,7 @@ export function LoadingStatus({ progress }: { progress: number }) {
   return (
     <div
       role="status"
+      aria-label="Loading anatomy"
       className="panel absolute top-1/2 left-1/2 z-40 flex w-72 -translate-x-1/2 -translate-y-1/2 items-center gap-3 p-4"
     >
       <Activity size={20} className="shrink-0 text-accent" aria-hidden />
