@@ -36,7 +36,7 @@ export const SystemsPanel = forwardRef<HTMLElement, Props>(function SystemsPanel
         "fixed inset-x-2 bottom-2 max-h-[70dvh]",
         !open && "max-md:hidden",
         // Desktop side panel
-        "md:absolute md:inset-x-auto md:top-24 md:bottom-auto md:left-4 md:max-h-[calc(100dvh-14rem)] md:w-64",
+        "md:absolute md:inset-x-auto md:top-24 md:bottom-auto md:left-4 md:max-h-[calc(100dvh-12rem)] md:w-64",
       )}
     >
       <div className="flex items-center justify-between px-4 pt-3 pb-2">

@@ -62,7 +62,7 @@ export const DetailPanel = forwardRef<HTMLElement, Props>(function DetailPanel(
       className={clsx(
         "panel z-30 flex flex-col overflow-hidden bg-surface-solid/95",
         "fixed inset-x-2 bottom-2 max-h-[46dvh]",
-        "md:absolute md:inset-x-auto md:top-24 md:right-4 md:bottom-auto md:max-h-[calc(100dvh-14rem)] md:w-80",
+        "md:absolute md:inset-x-auto md:top-24 md:right-4 md:bottom-auto md:max-h-[calc(100dvh-12rem)] md:w-80",
       )}
     >
       <div className="h-1 shrink-0" style={{ background: system?.color }} aria-hidden />
