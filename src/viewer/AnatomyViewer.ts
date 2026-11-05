@@ -589,8 +589,12 @@ export class AnatomyViewer {
 
     const loadChunk = async (chunkIndex: number) => {
       const chunk = atlas.chunks[chunkIndex]!;
-      const file = (chunk.gzip ?? chunk.url).split("/").pop()!;
-      const response = await fetch(this.options.modelBase + file, { signal: this.abort.signal });
+      const source = chunk.gzip ?? chunk.url;
+      // Versioned paths (/models/<version>/file) are used as given; plain names use modelBase.
+      const url = /^\/models\/[^/]+\//.test(source)
+        ? source
+        : this.options.modelBase + source.split("/").pop()!;
+      const response = await fetch(url, { signal: this.abort.signal });
       const buffer = await decodeModelResponse(response, chunk.bytes);
       if (this.disposed) return;
 
@@ -598,13 +602,17 @@ export class AnatomyViewer {
       atlas.parts.forEach((part, i) => {
         if (part.chunk !== chunkIndex) return;
         const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute(
-          "position",
-          new THREE.BufferAttribute(
-            new Float32Array(buffer, part.positions, part.vertexCount * 3),
-            3,
-          ),
-        );
+        const positions = new Float32Array(buffer, part.positions, part.vertexCount * 3);
+        if (chunk.scale || chunk.offset) {
+          const s = chunk.scale ?? 1;
+          const [ox, oy, oz] = chunk.offset ?? [0, 0, 0];
+          for (let k = 0; k < positions.length; k += 3) {
+            positions[k] = positions[k]! * s + ox;
+            positions[k + 1] = positions[k + 1]! * s + oy;
+            positions[k + 2] = positions[k + 2]! * s + oz;
+          }
+        }
+        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
         // Normalised signed-short normals keep the whole atlas compact in GPU memory.
         geometry.setAttribute(
           "normal",

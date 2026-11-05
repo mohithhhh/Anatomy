@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { registerAtlasTools } from "@/agent/web-mcp";
 import { trackVisit } from "@/analytics";
-import { loadAtlas, type AtlasIndex } from "@/atlas/atlas-index";
+import { loadAtlas, loadHybridFemale, type AtlasIndex } from "@/atlas/atlas-index";
 import { BODIES } from "@/atlas/model-source";
 import type { Concept, SystemId } from "@/atlas/types";
 import { buildContent, type StudyItem } from "@/content/content";
@@ -90,7 +90,17 @@ export default function App() {
   const body = view.body;
   useEffect(() => {
     const abort = new AbortController();
-    loadAtlas(BODIES[body].atlasUrl, abort.signal)
+    const load =
+      body === "female"
+        ? loadHybridFemale(
+            BODIES.female.atlasUrl,
+            BODIES.female.base,
+            BODIES.male.atlasUrl,
+            BODIES.male.base,
+            abort.signal,
+          )
+        : loadAtlas(BODIES[body].atlasUrl, abort.signal);
+    load
       .then((loaded) => {
         setProgress(0);
         setReady(false);

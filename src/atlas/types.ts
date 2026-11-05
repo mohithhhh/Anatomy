@@ -31,6 +31,8 @@ export interface Part {
   bounds: [number[], number[]];
   /** Uberon ID from the source, when the mesh was given its own concept on load. */
   uberon?: string;
+  /** Filled in from the male reference and scaled; not female-specific anatomy. */
+  approximate?: boolean;
 }
 
 /** A named FMA concept. It may group several meshes (`elements` are part IDs). */
@@ -45,6 +47,10 @@ export interface Chunk {
   bytes: number;
   gzip?: string;
   gzipBytes?: number;
+  /** Uniform scale applied to this chunk's vertices on load (hybrid female body). */
+  scale?: number;
+  /** Translation applied after scaling (metres). */
+  offset?: [number, number, number];
 }
 
 export interface Atlas {
