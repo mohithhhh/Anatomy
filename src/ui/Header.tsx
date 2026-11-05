@@ -2,8 +2,12 @@ import { Compass, GraduationCap, Info, Search } from "lucide-react";
 import { forwardRef } from "react";
 import { IconButton } from "./IconButton";
 
+import { BODIES, type BodyId } from "@/atlas/model-source";
+
 interface Props {
   pieces: number;
+  body: BodyId;
+  onBody: (body: BodyId) => void;
   studying: boolean;
   /** Cards due across all decks, shown as a badge. */
   due: number;
@@ -15,7 +19,7 @@ interface Props {
 export const APP_NAME = "Anatomy";
 
 export const Header = forwardRef<HTMLElement, Props>(function Header(
-  { pieces, studying, due, onSearch, onAbout, onToggleStudy },
+  { pieces, body, onBody, studying, due, onSearch, onAbout, onToggleStudy },
   ref,
 ) {
   return (
@@ -31,10 +35,25 @@ export const Header = forwardRef<HTMLElement, Props>(function Header(
             3D
           </span>
         </h1>
-        <p className="mt-0.5 text-xs text-ink-muted">
-          {pieces.toLocaleString("en")} structures
-          <span className="hidden sm:inline"> · BodyParts3D</span>
-        </p>
+        <div className="mt-1.5 flex items-center gap-2">
+          <div role="radiogroup" aria-label="Body" className="flex rounded-lg bg-ink/[0.06] p-0.5">
+            {(Object.keys(BODIES) as BodyId[]).map((id) => (
+              <button
+                key={id}
+                type="button"
+                role="radio"
+                aria-checked={body === id}
+                onClick={() => onBody(id)}
+                className={`tap rounded-md px-2 py-0.5 text-xs font-medium transition-colors ${body === id ? "bg-white text-ink shadow-sm" : "text-ink-muted hover:text-ink"}`}
+              >
+                {BODIES[id].label}
+              </button>
+            ))}
+          </div>
+          <span className="hidden text-xs text-ink-muted tabular-nums sm:inline">
+            {pieces ? `${pieces.toLocaleString("en")} pieces · ${BODIES[body].source}` : "Loading…"}
+          </span>
+        </div>
       </div>
       <nav aria-label="Main" className="pointer-events-auto panel flex items-center gap-1 p-1">
         <button

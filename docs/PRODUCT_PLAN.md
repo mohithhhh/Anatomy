@@ -240,7 +240,7 @@ The PDF's eight gaps are included. New ideas are marked **NEW**.
    - An `<iframe>` embed for slides and course pages.
    - A classroom live quiz: the teacher's screen drives the question, students answer on their phones. This needs a small realtime backend.
 4. **Languages.** Spanish, Portuguese and Hindi labels first, a Latin label mode, and pronunciation audio.
-5. **Second body.** Reintroduce the HuBMAP female reference set (CC BY 4.0) as a separate body, labelled honestly as partial musculoskeletal coverage.
+5. **Second body.** Reintroduce the HuBMAP female reference set (CC BY 4.0) as a separate body, labelled honestly as partial musculoskeletal coverage. **Done (Nov 4, 2026):** Male/Female switch, link parameter `b=f`, meshes without a named concept get their own (sided from the `_L`/`_R` ID suffix), definitions matched by Uberon ID, and starter decks shown only when the body has enough structures.
 6. **Community mnemonics.** Users submit, a moderator approves, and each one is attached to a concept.
 7. **Optional accounts.** Sync progress across devices. Studying stays free and works without logging in.
 

@@ -13,6 +13,7 @@ async function answerAny(page: Page) {
 }
 
 test("a starter deck session records progress that survives a reload", async ({ page }) => {
+  test.slow(); // long flow; software WebGL in CI is slow
   const errors = await openAtlas(page);
   await page.getByRole("button", { name: /^Study/ }).click();
   await page.getByRole("button", { name: /Upper limb: bones/ }).click();

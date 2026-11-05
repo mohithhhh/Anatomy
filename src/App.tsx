@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { registerAtlasTools } from "@/agent/web-mcp";
 import { trackVisit } from "@/analytics";
 import { loadAtlas, type AtlasIndex } from "@/atlas/atlas-index";
-import { ATLAS_URL, MODEL_BASE } from "@/atlas/model-source";
+import { BODIES } from "@/atlas/model-source";
 import type { Concept, SystemId } from "@/atlas/types";
 import { buildContent, type StudyItem } from "@/content/content";
 import type { CuratedData } from "@/content/curated";
@@ -84,14 +84,34 @@ export default function App() {
   useEffect(() => {
     trackVisit();
     void loadDefinitions().then(setDefinitions, () => {});
+  }, []);
+
+  // Load the chosen body; switching bodies replaces the atlas and the viewer.
+  const body = view.body;
+  useEffect(() => {
     const abort = new AbortController();
-    loadAtlas(ATLAS_URL, abort.signal)
-      .then(setIndex)
+    loadAtlas(BODIES[body].atlasUrl, abort.signal)
+      .then((loaded) => {
+        setProgress(0);
+        setReady(false);
+        setIndex(loaded);
+      })
       .catch((e: unknown) => {
         if (e instanceof Error && e.name !== "AbortError") setError(e.message);
       });
     return () => abort.abort();
-  }, []);
+  }, [body]);
+
+  const switchBody = (next: "male" | "female") => {
+    if (next === body) return;
+    study.exit();
+    study.closeSummary();
+    setStudying(false);
+    setLesion(null);
+    setSlice(null);
+    setIndex(null);
+    update((s) => ({ ...DEFAULT_VIEW_STATE, body: next, visible: s.visible }));
+  };
 
   const content = useMemo(() => (index ? buildContent(index, CURATED) : null), [index]);
   const study = useStudy(content, CURATED);
@@ -435,7 +455,7 @@ export default function App() {
       {index && (
         <ViewerCanvas
           atlas={index.atlas}
-          modelBase={MODEL_BASE}
+          modelBase={BODIES[body].base}
           state={scene}
           insets={insets}
           initialCamera={initialCamera}
@@ -450,7 +470,9 @@ export default function App() {
 
       <Header
         ref={headerRef}
-        pieces={index?.atlas.parts.length ?? 2234}
+        pieces={index?.atlas.parts.length ?? 0}
+        body={body}
+        onBody={switchBody}
         studying={studying}
         due={study.dueTotal}
         onSearch={() => setSearchOpen(true)}
@@ -568,7 +590,8 @@ export default function App() {
 
       {aboutOpen && (
         <AboutDialog
-          pieces={index?.atlas.parts.length ?? 2234}
+          pieces={index?.atlas.parts.length ?? 0}
+          body={body}
           concepts={index?.atlas.concepts.length ?? 3432}
           onClose={() => setAboutOpen(false)}
         />

@@ -1,5 +1,6 @@
 import { DEFAULT_VISIBLE, SYSTEM_IDS, isSystemId } from "@/atlas/systems";
 import type { SystemId } from "@/atlas/types";
+import type { BodyId } from "@/atlas/model-source";
 import type { CameraPose, ViewPreset } from "@/viewer/AnatomyViewer";
 
 /** A concept groups one or more meshes; a part is a single mesh. */
@@ -10,6 +11,7 @@ export type Selection = { kind: "concept"; id: string } | { kind: "part"; id: st
  * hash, so a copied link reopens the same view.
  */
 export interface ViewState {
+  body: BodyId;
   visible: readonly SystemId[];
   selection: Selection | null;
   isolate: boolean;
@@ -21,6 +23,7 @@ export interface ViewState {
 }
 
 export const DEFAULT_VIEW_STATE: ViewState = {
+  body: "male",
   visible: DEFAULT_VISIBLE,
   selection: null,
   isolate: false,
@@ -36,8 +39,8 @@ const VIEW_CODES: Record<ViewPreset, string> = {
   side: "side",
   back: "back",
 };
-// FMA concepts look like FMA9611; BodyParts3D meshes like FJ1252 or FJ1452M.
-const ID_PATTERN = /^[A-Z]{2,4}\d{1,8}[A-Z]?$/;
+// FMA9611, FJ1452M (male); VH_F_kidney_capsule_L, HRA:VH_F (female).
+const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9:_.-]{1,79}$/;
 
 function sameSystems(a: readonly SystemId[], b: readonly SystemId[]): boolean {
   if (a.length !== b.length) return false;
@@ -53,6 +56,7 @@ export function orderSystems(ids: Iterable<SystemId>): SystemId[] {
 
 export function encodeViewState(state: ViewState): string {
   const params = new URLSearchParams();
+  if (state.body === "female") params.set("b", "f");
   if (state.selection) {
     params.set(state.selection.kind === "concept" ? "c" : "p", state.selection.id);
   }
@@ -67,7 +71,7 @@ export function encodeViewState(state: ViewState): string {
     params.set("cam", [...state.camera.position, ...state.camera.target].join(","));
   }
   // Commas are safe in a fragment; keep links readable.
-  return params.toString().replaceAll("%2C", ",");
+  return params.toString().replaceAll("%2C", ",").replaceAll("%3A", ":");
 }
 
 function decodeCamera(value: string | null): CameraPose | null {
@@ -110,6 +114,7 @@ export function decodeViewState(hash: string): ViewState {
   const view = VIEWS.find((v) => VIEW_CODES[v] === viewCode) ?? DEFAULT_VIEW_STATE.view;
 
   return {
+    body: params.get("b") === "f" ? "female" : "male",
     visible,
     selection,
     isolate: params.get("iso") === "1" && selection !== null,

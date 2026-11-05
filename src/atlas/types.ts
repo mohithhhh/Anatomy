@@ -13,7 +13,8 @@ export type SystemId =
   | "endocrine"
   | "reproductive"
   | "integumentary"
-  | "connective";
+  | "connective"
+  | "pregnancy";
 
 /** One source mesh. Byte offsets point into the chunk buffer named by `chunk`. */
 export interface Part {
@@ -28,6 +29,8 @@ export interface Part {
   vertexCount: number;
   indexCount: number;
   bounds: [number[], number[]];
+  /** Uberon ID from the source, when the mesh was given its own concept on load. */
+  uberon?: string;
 }
 
 /** A named FMA concept. It may group several meshes (`elements` are part IDs). */

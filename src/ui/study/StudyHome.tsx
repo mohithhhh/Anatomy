@@ -6,7 +6,7 @@ import type { ContentIndex } from "@/content/content";
 import type { CuratedData } from "@/content/curated";
 import type { Definitions } from "@/content/definitions";
 import { deckToAnki, downloadText } from "@/study/anki";
-import { STARTER_DECKS, deckItems, encodeDeckLink, makeDeck, type Deck } from "@/study/decks";
+import { availableStarters, deckItems, encodeDeckLink, makeDeck, type Deck } from "@/study/decks";
 import { cardsFor } from "@/study/questions";
 import type { Study } from "@/study/useStudy";
 import { IconButton } from "../IconButton";
@@ -42,7 +42,9 @@ export const StudyHome = forwardRef<HTMLElement, Props>(function StudyHome(
   const [copied, setCopied] = useState<string | null>(null);
   const { decks, overview } = study;
   const saved = new Set(decks.map((d) => d.id));
-  const starters = STARTER_DECKS.map((s) => makeDeck(s, s.name)).filter((d) => !saved.has(d.id));
+  const starters = availableStarters(content)
+    .map((s) => makeDeck(s, s.name))
+    .filter((d) => !saved.has(d.id));
 
   const share = async (deck: Deck) => {
     const url = `${window.location.origin}${window.location.pathname}#${encodeDeckLink(deck)}`;

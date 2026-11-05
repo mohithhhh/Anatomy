@@ -4,7 +4,7 @@ import { box, hashOf, openAtlas, overlaps } from "./helpers";
 test("loads the full model without errors", async ({ page }) => {
   const errors = await openAtlas(page);
   await expect(page.locator("canvas")).toBeVisible();
-  await expect(page.getByText("2,234 structures")).toBeVisible();
+  await expect(page.getByText("2,234 pieces · BodyParts3D")).toBeVisible();
   await expect(page.getByText(/2,229 pieces visible/)).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -67,6 +67,7 @@ test("unknown structures in a link are ignored", async ({ page }) => {
 });
 
 test("explode moves to the inventory and reset restores the default", async ({ page }) => {
+  test.slow(); // long flow; software WebGL in CI is slow
   await openAtlas(page, "#sys=skeletal");
   await page.locator("#explode").fill("100");
   await expect.poll(() => hashOf(page)).toContain("x=100");

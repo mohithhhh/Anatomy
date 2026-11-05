@@ -31,6 +31,11 @@ export function definitionFor(
   conceptId: string,
 ): FoundDefinition | null {
   if (!defs) return null;
+  const uberon = index.parts.get(index.concepts.get(conceptId)?.elements[0] ?? "")?.uberon;
+  if (uberon) {
+    const match = Object.values(defs.concepts).find((d) => d.uberon === uberon && d.definition);
+    if (match) return { ...match, general: false };
+  }
   const own = defs.concepts[conceptId];
   if (own?.definition) return { ...own, general: false };
   const concept = index.concepts.get(conceptId);

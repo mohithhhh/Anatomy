@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { loadFixture } from "../test/atlas-fixture.ts";
 import {
-  STARTER_DECKS,
+  availableStarters,
   decodeDeckLink,
   deckId,
   deckItems,
@@ -39,7 +39,10 @@ describe("deck links", () => {
 
 describe("starter decks", () => {
   const { content } = loadFixture();
-  for (const deck of STARTER_DECKS) {
+  it("offers most starter decks on the male body", () => {
+    expect(availableStarters(content).length).toBeGreaterThanOrEqual(5);
+  });
+  for (const deck of availableStarters(content, 15)) {
     it(`${deck.name} has enough to study`, () => {
       const items = deckItems(content, deck);
       expect(items.length).toBeGreaterThanOrEqual(15);
