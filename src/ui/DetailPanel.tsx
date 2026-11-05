@@ -133,6 +133,13 @@ export const DetailPanel = forwardRef<HTMLElement, Props>(function DetailPanel(
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-2 pb-3 select-text">
+        {part?.approximate && (
+          <p className="mb-2 rounded-lg bg-amber-50 px-2.5 py-1.5 text-[11px] text-amber-900">
+            Approximated from the male reference (BodyParts3D), scaled to this body. Not
+            female-specific anatomy.
+          </p>
+        )}
+
         {info && (info.regions.length > 0 || info.item?.side) && (
           <div className="mb-2 flex flex-wrap gap-1.5 text-xs">
             {info.regions.slice(0, 3).map((r) => (
